@@ -13,7 +13,7 @@
 
 
 
-<title>Hexo+Github搭建个人静态博客 | Finnegan - Blog</title>
+<title>Hexo+Github搭建个人静态博客 | Finnegan&#39;s Blog</title>
 
 
 
@@ -72,13 +72,13 @@
             <div class="navbar-header header-logo"><a href="/">Finnegan&#39;s Blog</a></div>
             <div class="menu navbar-right">
                 
-                    <a class="menu-item" href="/archives">归档</a>
+                    <a class="menu-item" href="/archives">推文 - Posts</a>
                 
-                    <a class="menu-item" href="/category">分类</a>
+                    <a class="menu-item" href="/category">分类 - Categories</a>
                 
-                    <a class="menu-item" href="/tag">标签</a>
+                    <a class="menu-item" href="/tag">标签 - Tags</a>
                 
-                    <a class="menu-item" href="/about">关于</a>
+                    <a class="menu-item" href="/about">关于 - About</a>
                 
                 <input id="switch_default" type="checkbox" class="switch_default">
                 <label for="switch_default" class="toggleBtn"></label>
@@ -97,13 +97,13 @@
             </div>
             <div class="menu" id="mobile-menu">
                 
-                    <a class="menu-item" href="/archives">归档</a>
+                    <a class="menu-item" href="/archives">推文 - Posts</a>
                 
-                    <a class="menu-item" href="/category">分类</a>
+                    <a class="menu-item" href="/category">分类 - Categories</a>
                 
-                    <a class="menu-item" href="/tag">标签</a>
+                    <a class="menu-item" href="/tag">标签 - Tags</a>
                 
-                    <a class="menu-item" href="/about">关于</a>
+                    <a class="menu-item" href="/about">关于 - About</a>
                 
             </div>
         </div>
@@ -131,9 +131,9 @@
     <div class="tocbot-list">
     </div>
     <div class="tocbot-list-menu">
-        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
-        <a onclick="go_top()">Back to top</a>
-        <a onclick="go_bottom()">Go to bottom</a>
+        <a class="tocbot-toc-expand" onclick="expand_toc()">全部展开</a>
+        <a onclick="go_top()">回到顶部</a>
+        <a onclick="go_bottom()">去往底部</a>
     </div>
 </div>
 
@@ -162,7 +162,7 @@
             scrollSmooth: true,
         });
         b.setAttribute("onclick", "collapse_toc()");
-        b.innerHTML = "Collapse all"
+        b.innerHTML = "全部折叠"
     }
 
     function collapse_toc() {
@@ -176,7 +176,7 @@
             scrollSmooth: true,
         });
         b.setAttribute("onclick", "expand_toc()");
-        b.innerHTML = "Expand all"
+        b.innerHTML = "全部展开"
     }
 
     function go_top() {
@@ -221,9 +221,6 @@
             <p>Hexo是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
 <h1 id="什么是静态博客？"><a href="#什么是静态博客？" class="headerlink" title="什么是静态博客？"></a>什么是静态博客？</h1><p>所谓静态博客就是通过生成工具（eg：Hexo；Hugo等），直接将作者所书写的博文编译成最终的 html；css；js 等静态文件。作者/博主只需将生成的文件部署在服务器 面即可被在互联网中访问。 其他用户通过浏览器访问服务器就会浏览到博客啦。</p>
 <h1 id="安装教程"><a href="#安装教程" class="headerlink" title="安装教程"></a>安装教程</h1><h2 id="Node-js"><a href="#Node-js" class="headerlink" title="Node.js"></a>Node.js</h2><h2 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h2><h2 id="Github"><a href="#Github" class="headerlink" title="Github"></a>Github</h2><h2 id="Hexo"><a href="#Hexo" class="headerlink" title="Hexo"></a>Hexo</h2><h1 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h1><h2 id="写博客"><a href="#写博客" class="headerlink" title="写博客"></a>写博客</h2><h2 id="更换主题"><a href="#更换主题" class="headerlink" title="更换主题"></a>更换主题</h2><h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><p>Github服务器位于国外，在国内访问速度受限，博客部署 <code>hexo d</code> 的时候经常会失败，这种情况就多部署几次直至成功就可以了。此外，如果访问速度过慢还可以使用一些加速手段（貌似部署时加速也没作用）或者用Gitee替换Github（搭建步骤基本一致，可以自行搜索）。</p>
-<h1 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h1><blockquote>
-<p>悄悄地继往开来，何必弄到皇皇的空前绝后</p>
-</blockquote>
 
         </div>
 
@@ -262,9 +259,9 @@
                 </span>
             </div>
             <div>
-                <a href="javascript:window.history.back();">back</a>
-                <span>· </span>
-                <a href="/">home</a>
+                <a href="javascript:window.history.back();">后退</a>
+                <span> · </span>
+                <a href="/">主页</a>
             </div>
         </section>
         <section class="post-nav">
