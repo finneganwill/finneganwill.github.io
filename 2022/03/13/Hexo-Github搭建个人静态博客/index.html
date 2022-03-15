@@ -232,20 +232,20 @@
 <li><p>安装完成后，可在命令行窗口 <code>win+R -&gt; cmd</code> 查看是否安装成功：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看node版本</span></span><br><span class="line">node -v</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看npm版本</span></span><br><span class="line">npm -v</span><br></pre></td></tr></table></figure>
 
-<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220315091333060.png" class="" title="image-20220315091333060"> </li>
+ </li>
 <li><p>修改全局模块和缓存路径（可选）</p>
 <p>默认情况下使用npm安装全局模块时，安装位置在C盘下：</p>
-<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220315095357759.png" class="" title="image-20220315095357759"> 
+ 
 
 <p>如果想更改全局模块的安装位置，可通过以下设置进行修改：</p>
 <ol>
 <li>在安装目录下新建两个目录【node_global】和【node_cache】，分别存放全局模块和缓存，并在【node_global】下创建【node_model】目录，用于配置环境变量</li>
 </ol>
-<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220315100436491.png" class="" title="image-20220315100436491"> 
+ 
 
 <ol start="2">
 <li><p>指定文件夹，在cmd中使用一下命令指定这两个文件夹：</p>
-<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220315104026464.png" class="" title="image-20220315104026464"> </li>
+ </li>
 <li><p>修改环境变量。配置完上述目录后需要修改环境变量：</p>
 <ul>
 <li><p>系统变量中新建</p>
@@ -263,13 +263,13 @@
 <h3 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h3><h2 id="Github"><a href="#Github" class="headerlink" title="Github"></a>Github</h2><h3 id="新建仓库"><a href="#新建仓库" class="headerlink" title="新建仓库"></a>新建仓库</h3><h3 id="Git连接"><a href="#Git连接" class="headerlink" title="Git连接"></a>Git连接</h3><h2 id="Hexo"><a href="#Hexo" class="headerlink" title="Hexo"></a>Hexo</h2><p>本地环境与远程仓库准备好后就可以来安装和使用Hexo了</p>
 <h3 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h3><ol>
 <li><p>选择一个文件夹，用来保存网站资源，比如这里在桌面准备了一个 Blog 目录：</p>
-<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220314211133967.png" class="" title="image-20220314211133967"> </li>
+ </li>
 <li><p>使用Git Bash进入该目录（在该目录下<code>右键 -&gt; Git Bash Here</code> 或者 <code>进入Git Bash Here使用命令进入指定目录</code> ）：</p>
-<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220314211306592.png" class="" title="image-20220314211306592"> </li>
+ </li>
 <li><p>执行命令安装Hexo：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
 
-<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220314211422925.png" class="" title="image-20220314211422925"> </li>
+ </li>
 </ol>
 <h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>安装Hexo之后，执行初始化命令可以生成站点所需要的的文件：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo init</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
