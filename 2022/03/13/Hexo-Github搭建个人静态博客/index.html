@@ -219,8 +219,8 @@
 
         <div class="post-content">
             <p>Hexo是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
-<h1 id="什么是静态博客？"><a href="#什么是静态博客？" class="headerlink" title="什么是静态博客？"></a>什么是静态博客？</h1><p>所谓静态博客就是通过生成工具（eg：Hexo；Hugo等），直接将作者所书写的博文编译成最终的 html；css；js 等静态文件。作者/博主只需将生成的文件部署在服务器 面即可被在互联网中访问。 其他用户通过浏览器访问服务器就会浏览到博客啦。</p>
-<h1 id="安装教程"><a href="#安装教程" class="headerlink" title="安装教程"></a>安装教程</h1><h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><h3 id="Node-js"><a href="#Node-js" class="headerlink" title="Node.js"></a>Node.js</h3><p>下载：</p>
+<h1 id="1-什么是静态博客？"><a href="#1-什么是静态博客？" class="headerlink" title="1. 什么是静态博客？"></a>1. 什么是静态博客？</h1><p>所谓静态博客就是通过生成工具（eg：Hexo；Halo等），直接将作者所书写的博文编译成最终的 html；css；js 等静态文件。作者/博主只需将生成的文件部署在服务器 面即可被在互联网中访问。 其他用户通过浏览器访问服务器就会浏览到博客啦。</p>
+<h1 id="2-安装教程"><a href="#2-安装教程" class="headerlink" title="2. 安装教程"></a>2. 安装教程</h1><h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><h3 id="Node-js"><a href="#Node-js" class="headerlink" title="Node.js"></a>Node.js</h3><p>下载：</p>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://nodejs.org/">Node.js 官网</a> </li>
 <li><a target="_blank" rel="noopener" href="http://nodejs.cn/">Node.js 中文网</a> </li>
@@ -241,27 +241,27 @@
 <h2 id="Github"><a href="#Github" class="headerlink" title="Github"></a>Github</h2><p>关于Github账号的创建这里就不再赘述了。</p>
 <h3 id="新建仓库"><a href="#新建仓库" class="headerlink" title="新建仓库"></a>新建仓库</h3><ol>
 <li><p>创建仓库时需要注意，仓库名的格式必须是：<code>用户名.github.io</code>。其他选项可根据需要自行设置。</p>
- </li>
+<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220316104424889.png" class="" title="image-20220316104424889"> </li>
 <li><p>创建好仓库后，就可以使用地址访问了</p>
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://用户名.github.io</span><br></pre></td></tr></table></figure>
 
 <p>或者在你的仓库中进入Settings，在网页最下面Github Pages，点击进入就可以看到你的站点信息了。</p>
- 
+<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220316105310854.png" class="" title="image-20220316105310854"> 
 
+<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220316105332704.png" class="" title="image-20220316105332704">
 
-
-  </li>
+<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220316105439070.png" class="" title="image-20220316105439070">  </li>
 </ol>
-<h3 id="Git连接"><a href="#Git连接" class="headerlink" title="Git连接"></a>Git连接</h3><h2 id="Hexo"><a href="#Hexo" class="headerlink" title="Hexo"></a>Hexo</h2><p>本地环境与远程仓库准备好后就可以来安装和使用Hexo了，官方文档在<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">这里</a> </p>
+<h2 id="Hexo"><a href="#Hexo" class="headerlink" title="Hexo"></a>Hexo</h2><p>本地环境与远程仓库准备好后就可以来安装和使用Hexo了，官方文档在<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">这里</a> </p>
 <h3 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h3><ol>
 <li><p>打开命令行窗口，在命令行中使用npm安装Hexo：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli </span><br></pre></td></tr></table></figure></li>
 </ol>
 <h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><ol>
 <li><p>选择一个目录用来保存网站资源，比如这里在桌面准备了一个 Blog 目录（以下命令以）：</p>
- </li>
+<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220314211133967.png" class="" title="image-20220314211133967"> </li>
 <li><p>使用Git Bash进入该目录（在该目录下<code>右键 -&gt; Git Bash Here</code> 或者 <code>打开Git Bash Here使用命令进入指定目录</code> ）：</p>
- </li>
+<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220314211306592.png" class="" title="image-20220314211306592"> </li>
 <li><p>Git Bash中执行初始化命令可以生成站点所需要的的文件：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">初始化站点文件</span></span><br><span class="line">hexo init</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">npm安装</span></span><br><span class="line">npm install</span><br></pre></td></tr></table></figure></li>
 </ol>
@@ -273,11 +273,10 @@
 <li><p>预览，浏览器地址栏输入：</p>
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:4000</span><br></pre></td></tr></table></figure>
 
- </li>
+<img src="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220316102402450.png" class="" title="image-20220316102402450"> </li>
 </ol>
-<h1 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h1><h2 id="新建"><a href="#新建" class="headerlink" title="新建"></a>新建</h2><h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><h2 id="主题"><a href="#主题" class="headerlink" title="主题"></a>主题</h2><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><h2 id="Hexo命令"><a href="#Hexo命令" class="headerlink" title="Hexo命令"></a>Hexo命令</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装hexo</span></span><br><span class="line">npm install -g hexo-cli</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">初始化</span></span><br><span class="line">hexo init </span><br><span class="line">npm install</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">生成网页文件 &amp; 本地预览</span></span><br><span class="line">hexo g</span><br><span class="line">hexo s</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装推送插件 &amp; 推送文章</span></span><br><span class="line">npm install hexo-deployer-git --save</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
-
-
+<h1 id="3-简单使用"><a href="#3-简单使用" class="headerlink" title="3. 简单使用"></a>3. 简单使用</h1><h2 id="新建"><a href="#新建" class="headerlink" title="新建"></a>新建</h2><h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><h2 id="主题"><a href="#主题" class="headerlink" title="主题"></a>主题</h2><p>更换主题可以到 <a target="_blank" rel="noopener" href="https://hexo.io/themes/">Hexo主题站</a> 浏览下载，关于主题的安装可参考主题文档（一般Github主题项目中都会有介绍），有时间的话我会再写一篇关于主题更换的博客。</p>
+<h1 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h1><h2 id="Hexo命令"><a href="#Hexo命令" class="headerlink" title="Hexo命令"></a>Hexo命令</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装hexo</span></span><br><span class="line">npm install -g hexo-cli</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">初始化</span></span><br><span class="line">hexo init </span><br><span class="line">npm install</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">生成网页文件 &amp; 本地预览</span></span><br><span class="line">hexo g</span><br><span class="line">hexo s</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装推送插件 &amp; 推送文章</span></span><br><span class="line">npm install hexo-deployer-git --save</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
 
 <h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>Github服务器位于国外，在国内访问速度受限，博客部署 <code>hexo d</code> 的时候经常会失败，这种情况就多部署几次直至成功就可以了。此外，如果访问速度过慢还可以使用一些加速手段（貌似部署时加速也没作用）或者用Gitee替换Github（搭建步骤基本一致，可以自行搜索）。</p>
 
