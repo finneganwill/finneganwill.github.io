@@ -13,7 +13,7 @@
 
 
 
-<title>分类啊 | Finnegan&#39;s Blog</title>
+<title>Nodejs安装教程 | Finnegan&#39;s Blog</title>
 
 
 
@@ -124,85 +124,122 @@
     }
 </script>
             <div class="main">
-                
+                <div class="container">
+    
+    
 
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Nodejs安装教程</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Finnegan</a>
+                    
 
+                    
+                        <span class="post-time">
+                        Date: <a href="#">2022 / 03 / 16&nbsp;&nbsp;9:44</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/Nodejs/">Nodejs</a>
+                            
+                                <a href="/categories/Nodejs/%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/">安装教程</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
 
-    <div class="container">
-        <div class="post-wrap categories">
-            <h2 class="post-title">-&nbsp;分类&nbsp;-</h2>
-            <div class="categories-card">
-                
-                    
-                    <div class="card-item">
-                        <div class="categories">
-                            <a href="/categories/Nodejs/">
-                                <h3>
-                                    <i class="iconfont icon-category" style="padding-right:3px"></i>
-                                    Nodejs
-                                </h3>
-                            </a>
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2022/03/16/Nodejs%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/">Nodejs安装教程</a>
-                                    </article>
-                                
-                            
-                            
-                        </div>
-                    </div>
-                
-                    
-                    <div class="card-item">
-                        <div class="categories">
-                            <a href="/categories/Hexo/">
-                                <h3>
-                                    <i class="iconfont icon-category" style="padding-right:3px"></i>
-                                    Hexo
-                                </h3>
-                            </a>
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/">Hexo+Github搭建个人静态博客（Win）</a>
-                                    </article>
-                                
-                            
-                            
-                        </div>
-                    </div>
-                
-                    
-                    <div class="card-item">
-                        <div class="categories">
-                            <a href="/categories/Nodejs/%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/">
-                                <h3>
-                                    <i class="iconfont icon-category" style="padding-right:3px"></i>
-                                    安装教程
-                                </h3>
-                            </a>
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2022/03/16/Nodejs%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/">Nodejs安装教程</a>
-                                    </article>
-                                
-                            
-                            
-                        </div>
-                    </div>
-                
-            </div>
+        <div class="post-content">
+            <ul>
+<li><p>没有特殊操作，有需要可自行修改安装目录，其他直接下一步即可</p>
+</li>
+<li><p>安装完成后，可在命令行窗口 <code>win+R -&gt; cmd</code> 查看是否安装成功：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看node版本</span></span><br><span class="line">node -v</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看npm版本</span></span><br><span class="line">npm -v</span><br></pre></td></tr></table></figure>
+
+ </li>
+<li><p>修改全局模块和缓存路径（可选）</p>
+<p>默认情况下使用npm安装全局模块时，安装位置在C盘下：</p>
+ 
+
+<p>如果想更改全局模块的安装位置，可通过以下设置进行修改：</p>
+<ol>
+<li>在安装目录下新建两个目录【node_global】和【node_cache】，分别存放全局模块和缓存，并在【node_global】下创建【node_model】目录，用于配置环境变量</li>
+</ol>
+<p><img src="Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/image-20220315100436491.png" alt="image-20220315100436491"> </p>
+<ol start="2">
+<li><p>指定文件夹，在cmd中使用一下命令指定这两个文件夹：</p>
+ </li>
+<li><p>修改环境变量。配置完上述目录后需要修改环境变量：</p>
+<ul>
+<li><p>系统变量中新建</p>
+<p>变量名：NODE_PATH </p>
+<p>变量值：【node_global】文件夹下的【node_modules】文件夹</p>
+</li>
+<li><p>用户变量中Path变量</p>
+<p>将默认的npm路径修改为新建的【node_global】路径</p>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
 
         </div>
-    </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Finnegan</span>
+                    </p>
+                
+                
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>悄悄地继往开来，何必弄到皇皇的空前绝后</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Nodejs/"># Nodejs</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">后退</a>
+                <span> · </span>
+                <a href="/">主页</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/03/13/Hexo-Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/">Hexo+Github搭建个人静态博客（Win）</a>
+            
+        </section>
+
+
+    </article>
+</div>
 
             </div>
             <footer id="footer" class="footer">
