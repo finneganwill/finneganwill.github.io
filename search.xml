@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Hello World</title>
+    <url>/2022/03/12/HelloWorld/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<img src="/2022/03/12/HelloWorld/hello-world.png" class="" title="hello-world"> 
+
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+      <categories>
+        <category>HelloWorld</category>
+      </categories>
+      <tags>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hexo&amp;Github搭建个人静态博客（Win）</title>
     <url>/2022/03/13/Hexo&amp;Github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/</url>
     <content><![CDATA[<p>Hexo是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p>
@@ -102,41 +128,15 @@
       </tags>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/2022/03/12/HelloWorld/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<img src="/2022/03/12/HelloWorld/hello-world.png" class="" title="hello-world"> 
-
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-      <categories>
-        <category>HelloWorld</category>
-      </categories>
-      <tags>
-        <tag>Hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【Java】拷贝.md</title>
-    <url>/2022/04/26/%E3%80%90Java%E3%80%91%E6%8B%B7%E8%B4%9D/</url>
+    <title>Java对象拷贝.md</title>
+    <url>/2022/04/26/Java%E5%AF%B9%E8%B1%A1%E6%8B%B7%E8%B4%9D/</url>
     <content><![CDATA[<h1 id="1-Java中创建对象的5种方式"><a href="#1-Java中创建对象的5种方式" class="headerlink" title="1. Java中创建对象的5种方式"></a>1. Java中创建对象的5种方式</h1><h2 id="1-1-new"><a href="#1-1-new" class="headerlink" title="1.1 new"></a>1.1 new</h2><p><code>new</code> 关键字创建对象是最常规的一种方法，可以通过调用有参或无参的构造方法实现对象的创建，例如：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">Object</span> <span class="variable">obj</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Object</span>();</span><br></pre></td></tr></table></figure>
 
 <h2 id="1-2-clazz-newInstance"><a href="#1-2-clazz-newInstance" class="headerlink" title="1.2 clazz.newInstance()"></a>1.2 clazz.newInstance()</h2><p>通过 <code>Class</code> 类的API实现创建对象，是一种反射方式。这种方式调用的是 public 无参构造，因此<strong>类必须具有公有的无参构造</strong>，否则会报错。</p>
 <blockquote>
 <p>这种方式在 Java 9 之后已经不推荐使用了：</p>
-<img src="/2022/04/26/%E3%80%90Java%E3%80%91%E6%8B%B7%E8%B4%9D/%E5%BC%83%E7%94%A8.png" class="" title="image-20220426113812098">  
+<img src="/2022/04/26/Java%E5%AF%B9%E8%B1%A1%E6%8B%B7%E8%B4%9D/%E5%BC%83%E7%94%A8.png" class="" title="image-20220426113812098">  
 </blockquote>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">Student</span> <span class="variable">s2</span> <span class="operator">=</span> Student.class.newInstance(); <span class="comment">// 方式一</span></span><br><span class="line"></span><br><span class="line"><span class="type">Student</span> <span class="variable">s2</span> <span class="operator">=</span> (Student) Class.forName(<span class="string">&quot;my.finn.Student&quot;</span>).newInstance(); <span class="comment">// 方式二</span></span><br></pre></td></tr></table></figure>
 
@@ -154,21 +154,21 @@
 
 <h2 id="1-5-反序列化"><a href="#1-5-反序列化" class="headerlink" title="1.5 反序列化"></a>1.5 反序列化</h2><p>反序列化是把磁盘文件中的对象数据或者把网络节点上的对象数据，恢复成Java对象模型的过程，反序列化<strong>不会调用任何构造函数</strong>。</p>
 <h1 id="2-对象拷贝"><a href="#2-对象拷贝" class="headerlink" title="2. 对象拷贝"></a>2. 对象拷贝</h1><h2 id="2-1-引用拷贝"><a href="#2-1-引用拷贝" class="headerlink" title="2.1 引用拷贝"></a>2.1 引用拷贝</h2><p><strong>引用拷贝：创建一个引用，该引用与原引用都指向同一个对象。</strong> </p>
-<img src="/2022/04/26/%E3%80%90Java%E3%80%91%E6%8B%B7%E8%B4%9D/%E5%BC%95%E7%94%A8%E6%8B%B7%E8%B4%9D.png" class="" title="引用拷贝"> 
+<img src="/2022/04/26/Java%E5%AF%B9%E8%B1%A1%E6%8B%B7%E8%B4%9D/%E5%BC%95%E7%94%A8%E6%8B%B7%E8%B4%9D.png" class="" title="引用拷贝"> 
 
 <h2 id="2-2-浅拷贝"><a href="#2-2-浅拷贝" class="headerlink" title="2.2 浅拷贝"></a>2.2 浅拷贝</h2><p><strong>浅拷贝：创建一个引用，并对对象进行拷贝，将创建的引用指向拷贝对象，拷贝时：</strong></p>
 <ul>
 <li><strong>基本数据类型的字段进行值复制</strong> </li>
 <li><strong>引用类型的字段复制一份引用并指向原引用所指向的对象</strong> </li>
 </ul>
-<img src="/2022/04/26/%E3%80%90Java%E3%80%91%E6%8B%B7%E8%B4%9D/%E6%B5%85%E6%8B%B7%E8%B4%9D.png" class="" title="浅拷贝"> 
+<img src="/2022/04/26/Java%E5%AF%B9%E8%B1%A1%E6%8B%B7%E8%B4%9D/%E6%B5%85%E6%8B%B7%E8%B4%9D.png" class="" title="浅拷贝"> 
 
 <h2 id="2-3-深拷贝"><a href="#2-3-深拷贝" class="headerlink" title="2.3 深拷贝"></a>2.3 深拷贝</h2><p><strong>深拷贝：创建一个引用，并对对象进行拷贝，将创建的引用指向拷贝对象，拷贝时：</strong></p>
 <ul>
 <li><strong>基本数据类型的字段进行值复制</strong> </li>
 <li><strong>引用类型的字段将引用和引用的对象都复制一份，并将拷贝引用指向拷贝对象</strong> </li>
 </ul>
-<img src="/2022/04/26/%E3%80%90Java%E3%80%91%E6%8B%B7%E8%B4%9D/%E6%B7%B1%E6%8B%B7%E8%B4%9D.png" class="" title="深拷贝"> 
+<img src="/2022/04/26/Java%E5%AF%B9%E8%B1%A1%E6%8B%B7%E8%B4%9D/%E6%B7%B1%E6%8B%B7%E8%B4%9D.png" class="" title="深拷贝"> 
 
 <h2 id="2-4-示例"><a href="#2-4-示例" class="headerlink" title="2.4 示例"></a>2.4 示例</h2><h3 id="Person-class"><a href="#Person-class" class="headerlink" title="Person.class"></a>Person.class</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Person</span> <span class="keyword">implements</span> <span class="title class_">Cloneable</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> Address address;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Person</span><span class="params">(String name, <span class="type">int</span> age, Address address)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        <span class="built_in">this</span>.age = age;</span><br><span class="line">        <span class="built_in">this</span>.address = address;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//省略setter/getter</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> Object <span class="title function_">clone</span><span class="params">()</span> <span class="keyword">throws</span> CloneNotSupportedException &#123; <span class="comment">//实现Cloneable接口中的clone()方法</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">super</span>.clone(); <span class="comment">//默认浅拷贝</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> Object <span class="title function_">clone</span><span class="params">(<span class="type">boolean</span> b)</span> <span class="keyword">throws</span> CloneNotSupportedException &#123; <span class="comment">// 深拷贝(为了方便测试这里就直接重载)</span></span><br><span class="line">        <span class="type">Person</span> <span class="variable">p</span> <span class="operator">=</span> (Person) <span class="built_in">this</span>.clone();</span><br><span class="line">        p.address = (Address) <span class="built_in">this</span>.address.clone();</span><br><span class="line">        <span class="keyword">return</span> p;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -176,7 +176,7 @@
 
 <h3 id="Main-class"><a href="#Main-class" class="headerlink" title="Main.class"></a>Main.class</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> CloneNotSupportedException &#123;</span><br><span class="line">        <span class="type">Address</span> <span class="variable">address</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Address</span>(<span class="string">&quot;China&quot;</span>);</span><br><span class="line">        <span class="type">Person</span> <span class="variable">person</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Person</span>(<span class="string">&quot;Finn&quot;</span>, <span class="number">18</span>, address);</span><br><span class="line"></span><br><span class="line">        <span class="type">Person</span> <span class="variable">clonedPerson</span> <span class="operator">=</span> person; <span class="comment">// 引用拷贝</span></span><br><span class="line">        System.out.println(<span class="string">&quot;**************** 引用拷贝 ****************&quot;</span>);</span><br><span class="line">        System.out.println(person);</span><br><span class="line">        System.out.println(clonedPerson);</span><br><span class="line">        System.out.println(person.getAddress());</span><br><span class="line">        System.out.println(clonedPerson.getAddress());</span><br><span class="line"></span><br><span class="line">        clonedPerson = (Person) person.clone(); <span class="comment">// 浅拷贝</span></span><br><span class="line">        System.out.println(<span class="string">&quot;**************** 浅拷贝 ****************&quot;</span>);</span><br><span class="line">        System.out.println(person);</span><br><span class="line">        System.out.println(clonedPerson);</span><br><span class="line">        System.out.println(person.getAddress());</span><br><span class="line">        System.out.println(clonedPerson.getAddress());</span><br><span class="line"></span><br><span class="line">        clonedPerson = (Person) person.clone(<span class="literal">true</span>); <span class="comment">// 深拷贝</span></span><br><span class="line">        System.out.println(<span class="string">&quot;**************** 深拷贝 ****************&quot;</span>);</span><br><span class="line">        System.out.println(person);</span><br><span class="line">        System.out.println(clonedPerson);</span><br><span class="line">        System.out.println(person.getAddress());</span><br><span class="line">        System.out.println(clonedPerson.getAddress());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h3 id="打印结果"><a href="#打印结果" class="headerlink" title="打印结果"></a>打印结果</h3><img src="/2022/04/26/%E3%80%90Java%E3%80%91%E6%8B%B7%E8%B4%9D/%E6%8B%B7%E8%B4%9D%E6%89%93%E5%8D%B0%E7%A4%BA%E4%BE%8B.png" class="" title="拷贝打印示例"> 
+<h3 id="打印结果"><a href="#打印结果" class="headerlink" title="打印结果"></a>打印结果</h3><img src="/2022/04/26/Java%E5%AF%B9%E8%B1%A1%E6%8B%B7%E8%B4%9D/%E6%8B%B7%E8%B4%9D%E6%89%93%E5%8D%B0%E7%A4%BA%E4%BE%8B.png" class="" title="拷贝打印示例"> 
 
 <h1 id="3-总结"><a href="#3-总结" class="headerlink" title="3 总结"></a>3 总结</h1><ol>
 <li><p>java中创建对象的几种方式</p>
