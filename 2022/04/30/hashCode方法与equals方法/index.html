@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Finnegan">
+
+
+
+
+
+<title>Java hashCode()与equals() | Finnegan&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/logo.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Finnegan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">归档 - Archives</a>
+                
+                    <a class="menu-item" href="/category">分类 - Categories</a>
+                
+                    <a class="menu-item" href="/tag">标签 - Tags</a>
+                
+                    <a class="menu-item" href="/about">关于 - About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Finnegan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">归档 - Archives</a>
+                
+                    <a class="menu-item" href="/category">分类 - Categories</a>
+                
+                    <a class="menu-item" href="/tag">标签 - Tags</a>
+                
+                    <a class="menu-item" href="/about">关于 - About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">全部展开</a>
+        <a onclick="go_top()">回到顶部</a>
+        <a onclick="go_bottom()">去往底部</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "全部折叠"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "全部展开"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Java hashCode()与equals()</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Finnegan</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">2022 / 04 / 30&nbsp;&nbsp;16:42</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/Java/">Java</a>
+                            
+                                <a href="/categories/Java/OOP/">OOP</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>Java中有一个顶级父类 <code>Object</code> ，Java 允许把任何类型的对象赋给 Object 类型的变量。当一个类被定义后，如果没有指定继承的父类，那么默认父类就是 Object 类。今天就来聊聊Object类中两个方法：<code>equals()</code> 和 <code>hashCode()</code> 。</p>
+<h1 id="1-equals"><a href="#1-equals" class="headerlink" title="1. equals()"></a>1. equals()</h1><p><code>equals()</code> 用来比较两个对象之间的是否相等。它的源码（JDK11）如下：</p>
+<blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">Indicates whether some other object is &quot;equal to&quot; this one.</span></span><br><span class="line"><span class="comment">The equals method implements an equivalence relation on non-null object references:</span></span><br><span class="line"><span class="comment">It is reflexive: for any non-null reference value x, x.equals(x) should return true.</span></span><br><span class="line"><span class="comment">It is symmetric: for any non-null reference values x and y, x.equals(y) should return true if and only if y.equals(x) returns true.</span></span><br><span class="line"><span class="comment">It is transitive: for any non-null reference values x, y, and z, if x.equals(y) returns true and y.equals(z) returns true, then x.equals(z) should return true.</span></span><br><span class="line"><span class="comment">It is consistent: for any non-null reference values x and y, multiple invocations of x.equals(y) consistently return true or consistently return false, provided no information used in equals comparisons on the objects is modified.</span></span><br><span class="line"><span class="comment">For any non-null reference value x, x.equals(null) should return false.</span></span><br><span class="line"><span class="comment">The equals method for class Object implements the most discriminating possible equivalence relation on objects; that is, for any non-null reference values x and y, this method returns true if and only if x and y refer to the same object (x == y has the value true).</span></span><br><span class="line"><span class="comment">Note that it is generally necessary to override the hashCode method whenever this method is overridden, so as to maintain the general contract for the hashCode method, which states that equal objects must have equal hash codes.</span></span><br><span class="line"><span class="comment">Params:</span></span><br><span class="line"><span class="comment">obj – the reference object with which to compare.</span></span><br><span class="line"><span class="comment">Returns:</span></span><br><span class="line"><span class="comment">true if this object is the same as the obj argument; false otherwise.</span></span><br><span class="line"><span class="comment">See Also: hashCode(), java.util.HashMap</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">equals</span><span class="params">(Object obj)</span> &#123;<span class="keyword">return</span> (<span class="built_in">this</span> == obj);&#125;</span><br></pre></td></tr></table></figure>
+
+<p>【注释文档翻译】</p>
+<p>表示其他对象是否 “等于”这个对象。equals方法实现了对非空对象引用的等价关系。</p>
+<p>它是自反的：对于任何非空的引用值 x，x.equals(x) 应该返回 true。<br>它是对称的：对于任何非空的引用值 x 和 y，x.equals(y) 应该返回 true，当且仅当 y.equals(x) 返回 true。<br>它是传递的：对于任何非空参考值 x、y 和 z，如果 x.equals(y) 返回 true，y.equals(z) 返回 true ，那么 x.equals(z) 应该返回 true。<br>它是一致的：对于任何非空的参考值 x 和 y，如果没有修改对象上的等价比较信息，多次调用 x.equals(y) 一致地返回 true 或一致地返回 false。</p>
+<p>对于任何非空的引用值 x，x.equals(null) 应该返回 false。</p>
+<p>Object类的 equals 方法在对象上实现了最有鉴别力的等价关系；也就是说，对于任何非空的引用值 x 和 y ，当且仅当 x 和 y 指向同一个对象时，该方法返回 true（x == y的值为true）。</p>
+<p><strong>请注意，一般来说，只要重写这个方法，就必须重写hashCode方法，这样才能保持hashCode方法的一般契约，即相等的对象必须有相等的哈希代码。</strong> </p>
+<p>参数：obj - 与之比较的参考对象。</p>
+<p>返回：true 如果这个对象与obj 参数相同；否则为false。</p>
+<p>参见：hashCode(), java.util.HashMap</p>
+</blockquote>
+<p>可以看到，注释文档已经把 equals() 介绍的很详细了，主要总结为一下几点：</p>
+<ol>
+<li><strong>用来判断对象的等价关系</strong></li>
+<li><strong>具有自反性、对称性、传递性、一致性</strong></li>
+<li><strong>调用该方法的对象不能为空，否则会报空指针异常（NullPointerException, NPE）</strong></li>
+<li><strong>对于任何非空的引用值 x 和 y ，当且仅当 x 和 y 指向同一个对象时，该方法返回 true</strong></li>
+<li><strong>重写equals()时必须重写hashCode()</strong> </li>
+</ol>
+<hr>
+<p>对于前两点就不在多解释了，值得注意的是第3点，我们在IDEA（v2021.2）上使用空引用调用equals()时编译器并不会直接标红报错，而是会标黄。这种情况下不影响编译器编译，但在程序运行时会报错，在编写程序时要注意。</p>
+<p>比如在进行String对象与字符串比较时通常把已确定的字符串放在前，把String对象作equals()的参数传入，即：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String str= <span class="string">&quot;Hello World&quot;</span></span><br><span class="line"><span class="string">&quot;Hello World&quot;</span>.equals(str);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>关于第4点，在源码中可以看到Object类中的equals()判断使用的是 <code>==</code> 。关于 == 运算符：</p>
+<ul>
+<li> 判断基本数据类型时，是判断的值是否相同</li>
+<li>判断引用数据类型时，是比较是否指向同一对象，亦即地址值是否相同</li>
+</ul>
+<p>但是在业务中我们通常需要判断两个对象是否具有相同的内容，此时使用 == 就不能满足要求了，因此才需要通过重写euqals()来实现这样的逻辑，这也是 <code>==</code> 与 <code>equals()</code> 区别的根本所在。比如String类中的重写</p>
+<img src="/2022/04/30/hashCode%E6%96%B9%E6%B3%95%E4%B8%8Eequals%E6%96%B9%E6%B3%95/StringEquals.png" class="" title="StringEquals"> 
+
+<hr>
+<p>关于第5点，重写equals()时必须重写hashCode()，文档中说明了是为了“保持hashCode方法的一般契约，即相等的对象必须有相等的哈希代码”。更多原因可以继续参考 <em>3. 为什么要同时重写equals()和hashCode()？</em> 详细理解。</p>
+<h1 id="2-hashCode"><a href="#2-hashCode" class="headerlink" title="2. hashCode()"></a>2. hashCode()</h1><p><code>hashCode()</code> 用来返回该对象的哈希代码值（一个整数）。它的源码（JDK11）如下：</p>
+<blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">Returns a hash code value for the object. This method is supported for the benefit of hash tables such as those provided by java.util.HashMap.</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">The general contract of hashCode is:</span></span><br><span class="line"><span class="comment">- Whenever it is invoked on the same object more than once during an execution of a Java application, the hashCode method must consistently return the same integer, provided no information used in equals comparisons on the object is modified. This integer need not remain consistent from one execution of an application to another execution of the same application.</span></span><br><span class="line"><span class="comment">- If two objects are equal according to the equals(Object) method, then calling the hashCode method on each of the two objects must produce the same integer result.</span></span><br><span class="line"><span class="comment">- It is not required that if two objects are unequal according to the equals(Object) method, then calling the hashCode method on each of the two objects must produce distinct integer results. However, the programmer should be aware that producing distinct integer results for unequal objects may improve the performance of hash tables.</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">As much as is reasonably practical, the hashCode method defined by class Object does return distinct integers for distinct objects. (The hashCode may or may not be implemented as some function of an object&#x27;s memory address at some point in time.)</span></span><br><span class="line"><span class="comment">Returns:</span></span><br><span class="line"><span class="comment">a hash code value for this object.</span></span><br><span class="line"><span class="comment">See Also:</span></span><br><span class="line"><span class="comment">equals(Object), System.identityHashCode</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">native</span> <span class="type">int</span> <span class="title function_">hashCode</span><span class="params">()</span>;</span><br></pre></td></tr></table></figure>
+
+<p>【注释文档翻译】</p>
+<p>返回该对象的哈希代码值。支持这个方法是为了让哈希表受益，比如java.util.HashMap提供的哈希表。</p>
+<p>hashCode的一般契约是：</p>
+<ul>
+<li>在一个Java应用程序的执行过程中，无论何时对同一个对象调用多次，hashCode方法都必须一致地返回相同的整数，前提是在对象的等价比较中使用的信息没有被修改。这个整数不需要在一个应用程序的执行过程中与同一应用程序的另一个执行过程保持一致。</li>
+<li>如果两个对象根据equals(Object)方法是相等的，那么在这两个对象上调用hashCode方法必须产生相同的整数结果。</li>
+<li>如果根据equals(Object)方法，两个对象不相等，那么在这两个对象上调用hashCode方法必须产生不同的整数结果，这一点并不要求。然而，程序员应该知道，为不相等的对象产生不同的整数结果可能会提高哈希表的性能。</li>
+</ul>
+<p>在合理可行的情况下，由Object类定义的hashCode方法确实为不同的对象返回不同的整数。(hashCode可能是也可能不是在某个时间点作为对象的内存地址的某个函数来实现)。</p>
+<p>Return：该对象的哈希代码值<br>也请参见：equals(Object), System.identityHashCode</p>
+</blockquote>
+<p>从源码可以看到，Object类中的 hashCode() 是一个 <code>native</code> 方法。文档中也说明了前文提到的“hashCode的一般契约”，可以总结为一下几点：</p>
+<ol>
+<li>在同一次的应用执行过程中，同一个对象多次调用 hashCode() 返回的结果不变</li>
+<li>equals() 返回 true 时，两个对象的 hashCode() 返回的结果必须相同（为同一个整数）</li>
+<li>equals() 返回 false 时，两个对象的 hashCode() 返回的结果可以相同，但为不相等的对象产生不同的整数结果可能会提高哈希表的性能</li>
+<li>在合理可行的情况下，由Object类定义的 hashCode() 确实为不同的对象返回不同的整数</li>
+</ol>
+<p>第4点就是为什么重写 equals() 时也要重写hashCode()的根本所在，可以参考这里 <em>3.为什么要同时重写equals()和hashCode()？</em> 详细理解。</p>
+<h1 id="3-equals-与-的区别"><a href="#3-equals-与-的区别" class="headerlink" title="3. equals() 与 == 的区别"></a>3. equals() 与 == 的区别</h1><p>首先需要明确的是 <code>==</code> 是关系运算符，而 <code>equals()</code> 是方法，从这一点上就可以总结出二者的区别。</p>
+<p>== 作为关系运算符在Java语法中具有通用性，换句话说既可以用来比较基本数据类型，也可以比较引用类型：</p>
+<ul>
+<li> 判断基本类型时，是判断的值是否相同</li>
+<li>判断引用类型时，是比较是否指向同一对象，亦即地址值是否相同</li>
+</ul>
+<p>而 euqals() 归根是一个方法，因此对于基本类型来说是不存在调用方法这种行为的，它只能被一个对象实例调用。</p>
+<p>Object类中的 equals() 逻辑是用 == 实现的，此时比较的是两个引用所指向的地址：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">equals</span><span class="params">(Object obj)</span> &#123;<span class="keyword">return</span> (<span class="built_in">this</span> == obj);&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果要实现判断两个对象内容是否相同时，需要对 equals() 重写，如String类中通过重写实现了两个字符串内容的比较。</p>
+<h1 id="4-为什么要同时重写-equals-和-hashCode-？"><a href="#4-为什么要同时重写-equals-和-hashCode-？" class="headerlink" title="4. 为什么要同时重写 equals() 和 hashCode() ？"></a>4. 为什么要同时重写 equals() 和 hashCode() ？</h1><p><strong>符合Java对于 hashCode 的一般契约规定</strong> </p>
+<p>前文提到，Java要求开发人员在重写 equals() 要同时重写 hashCode() ，符合Java对于 hashCode 的一般契约规定。除此之外，这里再说明一下其他原因。</p>
+<p><strong>提高比较效率</strong> </p>
+<p>以HashSet为例，Set作为集合是不允许保存具有相同内容的对象的，注意这里是相同内容，不是相同地址。这是因为在对象存储到Set中去重逻辑是这样的：</p>
+<ol>
+<li>先判断是否存在哈希值是否相同，如果哈希值不同，则表示是不同对象，即可将元素加入Set</li>
+<li>如果哈希值相同，使用 equals() 判断是否存在内容相同，如果内容不同，则可加入Set，否则表示存在重复元素。</li>
+</ol>
+<p>先调用 hashCode() 方法可以减少调用 equals() 方法的次数，从而提高比较效率。</p>
+<p><strong>防止不必要的bug</strong> </p>
+<p>再来看一下只重写一个方法时，会有什么样的效果。</p>
+<ol>
+<li>只重写了 euqals() 不重写 hashCode()</li>
+</ol>
+<p>hashCode() 方法会为不同的对象返回不同的哈希值。如果有两个对象，它们的哈希值是不同的，但内容却相同。根据HashSet的去重逻辑，这两个对象是能被同时存储的Set中的，但这是不合理的，导致无法去重。</p>
+<ol start="2">
+<li>只重写了 hashCode() 不重写 euqals()</li>
+</ol>
+<p>Object类中的 equals() 会进行地址比较。如果有两个对象，它们的内容相同，重写 hashCode() 返回为它们返回相同的哈希值。根据HashSet的去重逻辑，哈希值相同时会调用 equals() 比较内容，但由于没有重写 equals() 导致返回了 false ，此时HashSet会认为它们的内容“不相同”，从而可以被同时存储的Set中的，但这是不合理的，导致无法去重。</p>
+<p><strong>总的来说，同时重写 equals() 和 hashCode() 的原因主要有这么几点：</strong></p>
+<ol>
+<li><strong>符合Java hashCode的一般契约</strong></li>
+<li><strong>提高比较效率</strong></li>
+<li><strong>参照Map / Set 的去重逻辑，防止产生不必要的bug</strong> </li>
+</ol>
+<h1 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h1><p>本篇无总结。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Finnegan</span>
+                    </p>
+                
+                
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>悄悄地继往开来，何必弄到皇皇的空前绝后</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Java/"># Java</a>
+                    
+                        <a href="/tags/hashcode/"># hashcode()</a>
+                    
+                        <a href="/tags/equals/"># equals()</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">后退</a>
+                <span> · </span>
+                <a href="/">主页</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/04/26/Java%E5%AF%B9%E8%B1%A1%E6%8B%B7%E8%B4%9D/">Java 对象拷贝.md</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>Finnegan © 2020 - 2022
+ | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a> |  
+        </span>
+        
+          <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<span class="site-uv">
+    总访客量:
+    <i class="busuanzi-value" id="busuanzi_value_site_uv"></i>
+</span>&nbsp;
+
+
+
+        
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
