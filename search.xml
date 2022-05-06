@@ -1,6 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>ArrayList扩容机制</title>
+    <url>/2022/05/06/ArrayList%E6%89%A9%E5%AE%B9%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[<h1 id="1-ArrayList简介"><a href="#1-ArrayList简介" class="headerlink" title="1. ArrayList简介"></a>1. ArrayList简介</h1><p><code>ArrayList</code> 是Collection接口的子接口List的主要实现类，源码部分如下（本文所展示的源码为<strong>JDK11</strong>版本，与JDK8略有不同）。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ArrayList</span>&lt;E&gt; <span class="keyword">extends</span> <span class="title class_">AbstractList</span>&lt;E&gt; <span class="keyword">implements</span> <span class="title class_">List</span>&lt;E&gt;, RandomAccess, Cloneable, java.io.Serializable&#123;</span><br><span class="line">    <span class="comment">/* 属性 */</span></span><br><span class="line">    <span class="comment">// 序列化ID</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">long</span> <span class="variable">serialVersionUID</span> <span class="operator">=</span> <span class="number">8683452581122892189L</span>;</span><br><span class="line">    </span><br><span class="line">   	<span class="comment">// 默认容量</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">DEFAULT_CAPACITY</span> <span class="operator">=</span> <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 空数组 EMPTY_ELEMENTDATA</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Object[] EMPTY_ELEMENTDATA = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 空数组 DEFAULTCAPACITY_EMPTY_ELEMENTDATA</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = &#123;&#125;;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Object数组，用来存储元素</span></span><br><span class="line">    <span class="keyword">transient</span> Object[] elementData;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// size = 列表中当前元素个数</span></span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> size;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 方法 */</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从成员方法中可以看到，设置了默认容量 <code>DEFAULT_CAPACITY = 10</code> ； 底层数据结构是 <code>Object[]</code> 数组，因此支持随机访问，适用于频繁的查找工作 。由于数组是连续内存空间，插入或删除（除尾操作外）一个元素需要移动其他元素，所以不适合在插入和删除操作频繁的场景下使用。</p>
+<p>ArrayList中还定义了两个空数组 <code>EMPTY_ELEMENTDATA</code> 和 <code>DEFAULTCAPACITY_EMPTY_ELEMENTDATA</code> ，这两个static数组结构完全一样，明明是一样的为什么要定义两个不同的呢？文档中对DEFAULTCAPACITY_EMPTY_ELEMENTDATA是这样解释的：</p>
+<blockquote>
+<p>Shared empty array instance used for default sized empty instances. We distinguish this from EMPTY_ELEMENTDATA to know how much to inflate when first element is added.</p>
+<p>用于默认大小的空实例的共享空数组实例。我们将其与EMPTY_ELEMENTDATA区分开来，以便知道添加第一个元素时应该膨胀多少。</p>
+</blockquote>
+<p>另外，<strong>ArrayList是线程不安全的</strong>。和Vector不同的是，ArrayList的成员方法并没有使用 <code>synchronized</code> ，而Vector中对可能设计线程安全问题的操作都进行了synchronized。</p>
+<p>ArrayList的底层是使用数组实现，数组使用时是固定容量大小的，而ArrayList容量可以随着元素的增加而自动增加，因此不用担心ArrayList容量不足的问题。这里就涉及到了ArrayList的扩容了，下面就结合源码对扩容机制进行详细地分析，看看ArrayList是如何扩容的。</p>
+<h1 id="2-ArrayList构造方法"><a href="#2-ArrayList构造方法" class="headerlink" title="2. ArrayList构造方法"></a>2. ArrayList构造方法</h1><h2 id="2-1-无参构造"><a href="#2-1-无参构造" class="headerlink" title="2.1 无参构造"></a>2.1 无参构造</h2><p>源码（JDK 11）：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">ArrayList</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">this</span>.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>无参构造逻辑非常简单，将 <code>DEFAULTCAPACITY_EMPTY_ELEMENTDATA</code> 赋值给了 <code>elementData</code> ，即通过无参构造方法创建的ArrayList实例的elementData是一个空数组。</p>
+<blockquote>
+<p>此时列表 <code>capacity == 0</code> and <code>size == 0</code> 。</p>
+</blockquote>
+<h2 id="2-2-有参构造之容量参数"><a href="#2-2-有参构造之容量参数" class="headerlink" title="2.2 有参构造之容量参数"></a>2.2 有参构造之容量参数</h2><p>源码（JDK 11）：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">ArrayList</span><span class="params">(<span class="type">int</span> initialCapacity)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (initialCapacity &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">this</span>.elementData = <span class="keyword">new</span> <span class="title class_">Object</span>[initialCapacity];</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (initialCapacity == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">this</span>.elementData = EMPTY_ELEMENTDATA;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;Illegal Capacity: &quot;</span> + initialCapacity);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ArrayList提供了传递容量值的有参构造，可以通过参数 <code>initialCapacity</code> 指定列表初始容量。该构造方法的逻辑解释如下：</p>
+<ol>
+<li><p>如果 <code>initialCapacity &gt; 0</code> ，则创建一个容量为 initialCapacity  的 <code>Object[]</code> ，并赋值给 <code>elementData</code> ；</p>
+<blockquote>
+<p>此时列表 capacity == initialCapacity  and size == 0</p>
+</blockquote>
+</li>
+<li><p>如果  <code>initialCapacity == 0</code> ，则将空数组 <code>EMPTY_ELEMENTDATA</code> 赋值给 <code>elementData</code> （这里的空数组与无参构造中的不同）；</p>
+<blockquote>
+<p>此时列表 capacity == 0 and size == 0</p>
+</blockquote>
+</li>
+<li><p>如果 <code>initialCapacity &lt; 0</code> ，则抛出非法参数异常，因为容量不能为负。</p>
+</li>
+</ol>
+<h2 id="2-3-有参构造之集合参数"><a href="#2-3-有参构造之集合参数" class="headerlink" title="2.3 有参构造之集合参数"></a>2.3 有参构造之集合参数</h2><p>源码（JDK 11）：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">ArrayList</span><span class="params">(Collection&lt;? extends E&gt; c)</span> &#123;</span><br><span class="line">    Object[] a = c.toArray();</span><br><span class="line">    <span class="keyword">if</span> ((size = a.length) != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (c.getClass() == ArrayList.class) &#123;</span><br><span class="line">            elementData = a;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            elementData = Arrays.copyOf(a, size, Object[].class);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// replace with empty array.</span></span><br><span class="line">        elementData = EMPTY_ELEMENTDATA;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ArrayList允许使用Collection类型构造实例，该方法构造一个包含指定集合元素的列表，按照集合的迭代器返回元素的顺序排列。</p>
+<h1 id="3-ArrayList数组扩容"><a href="#3-ArrayList数组扩容" class="headerlink" title="3. ArrayList数组扩容"></a>3. ArrayList数组扩容</h1><p>创建好ArrayList实例后，添加元素时，当列表容量不足时会对列表进行扩容，这要从ArrayList的 <code>add()</code> 方法讲起，来看看它是如何实现的。</p>
+<img src="/2022/05/06/ArrayList%E6%89%A9%E5%AE%B9%E6%9C%BA%E5%88%B6/add%E6%96%B9%E6%B3%95.png" class="" title="add方法"> 
+
+<p>ArrayList类中有2个 add()：</p>
+<ol>
+<li><code>void add(E e, Object[] elementData, int s)</code> 该方法是 private 的，不能被外部调用，该方法是将元素 <code>e</code> 插入到 <code>Object[]</code> 的索引 <code>s</code> 处</li>
+<li><code>boolean add(E e)</code> 该方法是将元素 e 添加到列表尾部</li>
+<li><code>boolean add(int index, E element)</code> 该方法是将元素 <code>element</code> 插入到指定索引 <code>index</code> 处</li>
+</ol>
+<p>显然，添加元素就会涉及到扩容问题（容量不足的情况下）。</p>
+<h2 id="3-1-添加元素"><a href="#3-1-添加元素" class="headerlink" title="3.1 添加元素"></a>3.1 添加元素</h2><h3 id="（1）-boolean-add-E-e"><a href="#（1）-boolean-add-E-e" class="headerlink" title="（1） boolean add(E e)"></a>（1） boolean add(E e)</h3><p>add(E e) 方法逻辑如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">add</span><span class="params">(E e)</span> &#123;</span><br><span class="line">    modCount++; <span class="comment">// 计数器</span></span><br><span class="line">    add(e, elementData, size); <span class="comment">// 调用private add()</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 私有 add()</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(E e, Object[] elementData, <span class="type">int</span> s)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (s == elementData.length)</span><br><span class="line">        elementData = grow(); <span class="comment">// 扩容</span></span><br><span class="line">    elementData[s] = e; <span class="comment">// 添加元素</span></span><br><span class="line">    size = s + <span class="number">1</span>; <span class="comment">// size + 1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>add(E e)</code> 中调用了私有的 <code>add(E e, Object[] elementData, int s)</code> 方法来添加元素，其中参数 s 传入了 size 。</p>
+<blockquote>
+<p><strong>void add(E e, Object[] elementData, int s)</strong> </p>
+<ol>
+<li><code>size</code> 与数组长度 <code>elementData.length</code> 比较。如果相等，则执行 <strong>2.</strong> ；不相等，则执行 <strong>3.</strong> </li>
+<li>数组已满，需要进行扩容（ <code>grow()</code> ）</li>
+<li>数组不满，直接将元素添加</li>
+</ol>
+</blockquote>
+<h3 id="（2）-boolean-add-int-index-E-element"><a href="#（2）-boolean-add-int-index-E-element" class="headerlink" title="（2） boolean add(int index, E element)"></a>（2） boolean add(int index, E element)</h3><p>add(int index, E element) 方法逻辑如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> index, E element)</span> &#123;</span><br><span class="line">    rangeCheckForAdd(index); <span class="comment">// 检查索引</span></span><br><span class="line">    modCount++; <span class="comment">// 计数器</span></span><br><span class="line">    <span class="keyword">final</span> <span class="type">int</span> s;</span><br><span class="line">    Object[] elementData;</span><br><span class="line">    <span class="keyword">if</span> ((s = size) == (elementData = <span class="built_in">this</span>.elementData).length) <span class="comment">// 判断数组是否满</span></span><br><span class="line">        elementData = grow(); <span class="comment">// 扩容</span></span><br><span class="line">    System.arraycopy(elementData, index, elementData, index + <span class="number">1</span>, s - index); <span class="comment">// 移动元素</span></span><br><span class="line">    elementData[index] = element; <span class="comment">// index处插入</span></span><br><span class="line">    size = s + <span class="number">1</span>; <span class="comment">// size + 1</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 检查索引</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">rangeCheckForAdd</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (index &gt; size || index &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IndexOutOfBoundsException</span>(outOfBoundsMsg(index));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>add(int index, E element)</code> 调用了 <code>rangeCheckForAdd(int index)</code> 来检查索引的合法性，非法索引会抛出异常。index 合法后会判断 size 与 length ，在数组满存的情况下调用 <code>grow()</code> 方法进行扩容。如果空间足够就会进行元素插入，与（1）方法中不同的是，该 add 是插入元素到指定 index ，因此会涉及元素移动。</p>
+<p>可以看到，（1）（2）两个 add() 方法中都调用了 <code>grow()</code> 进行扩容，下面就来看一下这个方法的具体实现。</p>
+<h2 id="3-2-扩容方法"><a href="#3-2-扩容方法" class="headerlink" title="3.2 扩容方法"></a>3.2 扩容方法</h2><p>扩容方法 <code>grow()</code> 源码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> Object[] grow() &#123;</span><br><span class="line">    <span class="keyword">return</span> grow(size + <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> Object[] grow(<span class="type">int</span> minCapacity) &#123;</span><br><span class="line">	<span class="type">return</span> <span class="variable">elementData</span> <span class="operator">=</span> Arrays.copyOf(elementData, newCapacity(minCapacity));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>  ArrayList中重载了grow()方法，无参 <code>grow()</code> 调用了有参 <code>grow(int minCapacity)</code> 。</p>
+<blockquote>
+<p><strong>Object[] grow(int minCapacity)</strong> </p>
+<p>- <code>minCapacity</code> 能够成功添加元素的最小容量</p>
+<p>- <code>return</code>  返回一个具有新容量的数组，新容量通过 <code>newCapacity()</code> 方法计算</p>
+</blockquote>
+<p>再来看一下 <code>newCapacity()</code> ：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="type">int</span> <span class="title function_">newCapacity</span><span class="params">(<span class="type">int</span> minCapacity)</span> &#123;</span><br><span class="line">    <span class="comment">// overflow-conscious code</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">oldCapacity</span> <span class="operator">=</span> elementData.length; <span class="comment">// 旧容量</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">newCapacity</span> <span class="operator">=</span> oldCapacity + (oldCapacity &gt;&gt; <span class="number">1</span>); <span class="comment">// 新容量</span></span><br><span class="line">    <span class="keyword">if</span> (newCapacity - minCapacity &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) <span class="comment">// 如果 elementData 是由无参构造创建</span></span><br><span class="line">            <span class="keyword">return</span> Math.max(DEFAULT_CAPACITY, minCapacity);</span><br><span class="line">        <span class="keyword">if</span> (minCapacity &lt; <span class="number">0</span>) <span class="comment">// overflow</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">OutOfMemoryError</span>();</span><br><span class="line">        <span class="keyword">return</span> minCapacity;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (newCapacity - MAX_ARRAY_SIZE &lt;= <span class="number">0</span>) ? newCapacity : hugeCapacity(minCapacity);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>int newCapacity(int minCapacity)</strong> </p>
+<ol>
+<li>使用旧容量 <code>oldCapacity</code> 计算新容量 <code>newCapacity</code> </li>
+<li>比较  <code>newCapacity</code> 与 <code>minCapacity</code> ，若  <code>newCapacity &gt; minCapacity </code> ，则 <code>return</code> ；否则，执行 <strong>3.</strong> </li>
+<li>判断 <code>elementData</code> 是否是由无参构造方法创建，若是，则 <code>return</code> ；否则，执行 <strong>4.</strong> </li>
+<li>判断 <code>minCapacity</code> 是否合法，若 <code>&lt; 0</code> ，抛出异常 <code>OutOfMemoryError</code> ；否则，<code>return minCapacity</code> </li>
+</ol>
+</blockquote>
+<p>从源码中可以看到，新的容量是以数组长度为基础进行计算的。<code>oldCapacity &gt;&gt; 1</code> 中涉及到了右移运算，对于一个正数来说，内存中已二进制进行存储，右移 1 位相当于缩小为原来的 1/2，<strong>因此 new 与 old 之间存在 <code>newCapacity = 1.5 * oldCapacity</code> 的关系</strong> 。</p>
+<p>其次，源码中对不同情况下有不同的 <code>return</code> ，下面通过例子对这些情况进行详细说明。根据不同构造方法，<code>elementData</code> 可以细分为以下情况：</p>
+<ol>
+<li>elementData = {}<ol>
+<li>elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA</li>
+<li>elementData == EMPTY_ELEMENTDATA : ArrayList(int initialCapacity)</li>
+<li>elementData == EMPTY_ELEMENTDATA : ArrayList(Collection&lt;? extends E&gt; c)</li>
+</ol>
+</li>
+<li>elementData != {}<ol>
+<li>一般的非空数组</li>
+<li>Collection转换的非空数组</li>
+</ol>
+</li>
+</ol>
+<blockquote>
+<p>1.2和1.3在扩容时属于同一种情况，2.1和2.2属于同一种，因此扩容时可以分为三种情况讨论，这一点从<code>newCapacity()</code> 中可以判断。</p>
+</blockquote>
+<h2 id="3-3-扩容分析"><a href="#3-3-扩容分析" class="headerlink" title="3.3 扩容分析"></a>3.3 扩容分析</h2><h3 id="1）elementData-DEFAULTCAPACITY-EMPTY-ELEMENTDATA"><a href="#1）elementData-DEFAULTCAPACITY-EMPTY-ELEMENTDATA" class="headerlink" title="1）elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA"></a>1）elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA</h3><p>ArrayList中定义了两种 <code>static final object[]</code> ，前面提到两个一样的空数组是为了区分使用不同的扩容规则，当ArrayList使用无参构造 <code>ArrayList()</code> 创建实例时，<code>elementData</code> 会被赋值为 <code>DEFAULTCAPACITY_EMPTY_ELEMENTDATA</code> 。</p>
+<p>当ArrayList首次添加元素时（下述中的 <code>=</code> 为数学逻辑）：</p>
+<ul>
+<li><p>size = 0, minCapacity = size + 1 = 1, oldCapacity = elementData.length = 0, newCapacity = 0</p>
+<p>=&gt; newCapacity - minCapacity &lt; 0,  DEFAULTCAPACITY_EMPTY_ELEMENTDATA</p>
+<p>=&gt; return Math.max(DEFAULT_CAPACITY, minCapacity), DEFAULT_CAPACITY = 10</p>
+<p>=&gt; return DEFAULT_CAPACITY</p>
+<p>=&gt; elementData.length = 10</p>
+</li>
+</ul>
+<p>无参构造下的空 ArrayList <strong>首次</strong>添加元素，elementData 扩容为10。待数组满存，再添加元素时：</p>
+<ul>
+<li><p>size = 10, minCapacity = size + 1 = 11, oldCapacity = elementData.length = 10, newCapacity = 15</p>
+<p>=&gt; newCapacity - minCapacity &gt; 0</p>
+<p>=&gt; return newCapacity</p>
+<p>=&gt; elementData.length = 15</p>
+</li>
+</ul>
+<p>elementData 按原容量的1.5倍扩容，并且容易得到，再下次扩容规则也是1.5倍。</p>
+<h3 id="2）elementData-EMPTY-ELEMENTDATA"><a href="#2）elementData-EMPTY-ELEMENTDATA" class="headerlink" title="2）elementData == EMPTY_ELEMENTDATA"></a>2）elementData == EMPTY_ELEMENTDATA</h3><p>当ArrayList使用有参构造 <code>ArrayList(int initialCapacity) </code> 和 <code>ArrayList(Collection&lt;? extends E&gt; c)</code> 创建实例时，若 <code>initialCapacity == 0</code> 或 <code>c.toArray().length == 0</code> ，<code>elementData</code> 会被赋值为 <code>EMPTY_ELEMENTDATA</code> 。</p>
+<p>当ArrayList首次添加元素时：</p>
+<ul>
+<li><p>size = 0, minCapacity = size + 1 = 1, oldCapacity = elementData.length = 0, newCapacity = 0</p>
+<p>=&gt; newCapacity - minCapacity &lt; 0, EMPTY_ELEMENTDATA, minCapacity &gt; 0</p>
+<p>=&gt; return minCapacity</p>
+<p>=&gt; elementData.length = 1</p>
+</li>
+</ul>
+<p>有参构造下的空 ArrayList <strong>首次</strong>添加元素，扩容为 minCapacity = 1。待数组满存，再添加元素时：</p>
+<ul>
+<li><p>size = 1, minCapacity = size + 1 = 2, oldCapacity = elementData.length = 1, newCapacity = 1</p>
+<p>=&gt; newCapacity - minCapacity &lt; 0, minCapacity &gt; 0</p>
+<p>=&gt; return minCapacity</p>
+<p>=&gt; elementData.length = 2</p>
+</li>
+<li><p>size = 2, minCapacity = size + 1 = 3, oldCapacity = elementData.length = 2, newCapacity = 3</p>
+<p>=&gt; newCapacity - minCapacity = 0, minCapacity &gt; 0</p>
+<p>=&gt; return minCapacity</p>
+<p>=&gt; elementData.length = 3</p>
+</li>
+<li><p>size = 3, minCapacity = size + 1 = 4, oldCapacity = elementData.length = 3, newCapacity = 4</p>
+<p>=&gt; newCapacity - minCapacity = 0, minCapacity &gt; 0</p>
+<p>=&gt; return minCapacity</p>
+<p>=&gt; elementData.length = 4</p>
+</li>
+<li><p>size = 4, minCapacity = size + 1 = 5, oldCapacity = elementData.length = 4, newCapacity = 6</p>
+<p>=&gt; newCapacity - minCapacity &gt; 0</p>
+<p>=&gt; return newCapacity </p>
+<p>=&gt; elementData.length = 6</p>
+</li>
+</ul>
+<p>当 elementData.length &lt; 4 时，按 minCapacity 扩容；当element.length &gt;= 4 时，按 newCapacity 扩容。</p>
+<h3 id="3）非空数组"><a href="#3）非空数组" class="headerlink" title="3）非空数组"></a>3）非空数组</h3><p>对于非空数组的扩容在上述也提到了，这里就不在赘述了：</p>
+<ul>
+<li>无参构造的非空数组扩容按 <code>1.5倍</code> 规则</li>
+<li>有参构造的非空数组扩容，length &lt; 4 按 <code>+1</code> 扩容，length &gt;= 4 按 <code>1.5倍</code> 扩容</li>
+</ul>
+<h2 id="3-4-验证"><a href="#3-4-验证" class="headerlink" title="3.4 验证"></a>3.4 验证</h2><p>为了验证上述分析，笔者用反射获取不同情况下添加元素时的elementData长度变化</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">printInfo</span><span class="params">(ArrayList&lt;Integer&gt; arrayList)</span> <span class="keyword">throws</span> NoSuchFieldException, IllegalAccessException &#123;</span><br><span class="line">    <span class="comment">// 反射获取 elementData</span></span><br><span class="line">    <span class="type">Field</span> <span class="variable">field</span> <span class="operator">=</span> ArrayList.class.getDeclaredField(<span class="string">&quot;elementData&quot;</span>);</span><br><span class="line">    field.setAccessible(<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 添加元素与打印</span></span><br><span class="line">    System.out.println(<span class="string">&quot;未添加元素&quot;</span>);</span><br><span class="line">    Object[] objects = (Object[]) field.get(arrayList);</span><br><span class="line">    System.out.println(<span class="string">&quot;初始数组长度：&quot;</span> + objects.length);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">12</span>; i++) &#123;</span><br><span class="line">        arrayList.add(i);</span><br><span class="line">        System.out.println(<span class="string">&quot;第&quot;</span> + i + <span class="string">&quot;添加元素&quot;</span>);</span><br><span class="line">        objects = (Object[]) field.get(arrayList);</span><br><span class="line">        <span class="keyword">if</span> (i &gt;= <span class="number">4</span>) &#123;</span><br><span class="line">            objects = (Object[]) field.get(arrayList);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">&quot;数组长度：&quot;</span> + objects.length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IllegalAccessException, NoSuchFieldException &#123;</span><br><span class="line">    <span class="comment">// 无参构造实例</span></span><br><span class="line">    ArrayList&lt;Integer&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 容量参数构造</span></span><br><span class="line">    ArrayList&lt;Integer&gt; arrayList0 = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(<span class="number">0</span>); <span class="comment">// 容量为0</span></span><br><span class="line">    ArrayList&lt;Integer&gt; arrayList2 = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(<span class="number">2</span>); <span class="comment">// 容量为2</span></span><br><span class="line">    ArrayList&lt;Integer&gt; arrayList6 = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(<span class="number">6</span>); <span class="comment">// 容量为6</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Collection构造和情况一致，此处省略，可自行设计</span></span><br><span class="line"></span><br><span class="line">    printInfo(list); <span class="comment">// 替换list可以看到不同情况的效果</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>打印结果如图，可以看到和上述分析结果一致：</p>
+<img src="/2022/05/06/ArrayList%E6%89%A9%E5%AE%B9%E6%9C%BA%E5%88%B6/%E6%89%93%E5%8D%B0.png" class="" title="文件">
+
+<h1 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h1><p>通过上述的分析可以得到不同情况下的扩容规则（<strong>扩容时机是列表满存</strong>）：</p>
+<ol>
+<li>使用无参构造 ArrayList() 创建实例，<ul>
+<li><strong>首次</strong> 添加元素，扩容为 <code>默认容量 10 </code> </li>
+<li>后续满存时按 <code>1.5倍</code> 扩容</li>
+</ul>
+</li>
+<li>使用有参构造 ArrayList(int initialCapacity) 和 ArrayList(Collection&lt;? extends E&gt; c) 创建实例，<ul>
+<li>如果添加元素时数组长度（列表容量）小于4，按 <code>+1</code> 扩容</li>
+<li>如果添加元素时数组长度（列表容量）大于等于4，按 <code>1.5倍</code> 扩容</li>
+</ul>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Collection</category>
+        <category>List</category>
+      </categories>
+      <tags>
+        <tag>ArrayList</tag>
+        <tag>Java</tag>
+        <tag>集合数组扩容机制</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/2022/03/12/HelloWorld/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
@@ -336,203 +533,6 @@
         <tag>Java</tag>
         <tag>hashcode()</tag>
         <tag>equals()</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ArrayList扩容机制</title>
-    <url>/2022/05/06/ArrayList%E6%89%A9%E5%AE%B9%E6%9C%BA%E5%88%B6/</url>
-    <content><![CDATA[<h1 id="1-ArrayList简介"><a href="#1-ArrayList简介" class="headerlink" title="1. ArrayList简介"></a>1. ArrayList简介</h1><p><code>ArrayList</code> 是Collection接口的子接口List的主要实现类，源码部分如下（本文所展示的源码为<strong>JDK11</strong>版本，与JDK8略有不同）。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ArrayList</span>&lt;E&gt; <span class="keyword">extends</span> <span class="title class_">AbstractList</span>&lt;E&gt; <span class="keyword">implements</span> <span class="title class_">List</span>&lt;E&gt;, RandomAccess, Cloneable, java.io.Serializable&#123;</span><br><span class="line">    <span class="comment">/* 属性 */</span></span><br><span class="line">    <span class="comment">// 序列化ID</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">long</span> <span class="variable">serialVersionUID</span> <span class="operator">=</span> <span class="number">8683452581122892189L</span>;</span><br><span class="line">    </span><br><span class="line">   	<span class="comment">// 默认容量</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">DEFAULT_CAPACITY</span> <span class="operator">=</span> <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 空数组 EMPTY_ELEMENTDATA</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Object[] EMPTY_ELEMENTDATA = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 空数组 DEFAULTCAPACITY_EMPTY_ELEMENTDATA</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = &#123;&#125;;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Object数组，用来存储元素</span></span><br><span class="line">    <span class="keyword">transient</span> Object[] elementData;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// size = 列表中当前元素个数</span></span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> size;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 方法 */</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>从成员方法中可以看到，设置了默认容量 <code>DEFAULT_CAPACITY = 10</code> ； 底层数据结构是 <code>Object[]</code> 数组，因此支持随机访问，适用于频繁的查找工作 。由于数组是连续内存空间，插入或删除（除尾操作外）一个元素需要移动其他元素，所以不适合在插入和删除操作频繁的场景下使用。</p>
-<p>ArrayList中还定义了两个空数组 <code>EMPTY_ELEMENTDATA</code> 和 <code>DEFAULTCAPACITY_EMPTY_ELEMENTDATA</code> ，这两个static数组结构完全一样，明明是一样的为什么要定义两个不同的呢？文档中对DEFAULTCAPACITY_EMPTY_ELEMENTDATA是这样解释的：</p>
-<blockquote>
-<p>Shared empty array instance used for default sized empty instances. We distinguish this from EMPTY_ELEMENTDATA to know how much to inflate when first element is added.</p>
-<p>用于默认大小的空实例的共享空数组实例。我们将其与EMPTY_ELEMENTDATA区分开来，以便知道添加第一个元素时应该膨胀多少。</p>
-</blockquote>
-<p>另外，<strong>ArrayList是线程不安全的</strong>。和Vector不同的是，ArrayList的成员方法并没有使用 <code>synchronized</code> ，而Vector中对可能设计线程安全问题的操作都进行了synchronized。</p>
-<p>ArrayList的底层是使用数组实现，数组使用时是固定容量大小的，而ArrayList容量可以随着元素的增加而自动增加，因此不用担心ArrayList容量不足的问题。这里就涉及到了ArrayList的扩容了，下面就结合源码对扩容机制进行详细地分析，看看ArrayList是如何扩容的。</p>
-<h1 id="2-ArrayList构造方法"><a href="#2-ArrayList构造方法" class="headerlink" title="2. ArrayList构造方法"></a>2. ArrayList构造方法</h1><h2 id="2-1-无参构造"><a href="#2-1-无参构造" class="headerlink" title="2.1 无参构造"></a>2.1 无参构造</h2><p>源码（JDK 11）：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">ArrayList</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">this</span>.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>无参构造逻辑非常简单，将 <code>DEFAULTCAPACITY_EMPTY_ELEMENTDATA</code> 赋值给了 <code>elementData</code> ，即通过无参构造方法创建的ArrayList实例的elementData是一个空数组。</p>
-<blockquote>
-<p>此时列表 <code>capacity == 0</code> and <code>size == 0</code> 。</p>
-</blockquote>
-<h2 id="2-2-有参构造之容量参数"><a href="#2-2-有参构造之容量参数" class="headerlink" title="2.2 有参构造之容量参数"></a>2.2 有参构造之容量参数</h2><p>源码（JDK 11）：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">ArrayList</span><span class="params">(<span class="type">int</span> initialCapacity)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (initialCapacity &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">this</span>.elementData = <span class="keyword">new</span> <span class="title class_">Object</span>[initialCapacity];</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (initialCapacity == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">this</span>.elementData = EMPTY_ELEMENTDATA;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;Illegal Capacity: &quot;</span> + initialCapacity);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>ArrayList提供了传递容量值的有参构造，可以通过参数 <code>initialCapacity</code> 指定列表初始容量。该构造方法的逻辑解释如下：</p>
-<ol>
-<li><p>如果 <code>initialCapacity &gt; 0</code> ，则创建一个容量为 initialCapacity  的 <code>Object[]</code> ，并赋值给 <code>elementData</code> ；</p>
-<blockquote>
-<p>此时列表 capacity == initialCapacity  and size == 0</p>
-</blockquote>
-</li>
-<li><p>如果  <code>initialCapacity == 0</code> ，则将空数组 <code>EMPTY_ELEMENTDATA</code> 赋值给 <code>elementData</code> （这里的空数组与无参构造中的不同）；</p>
-<blockquote>
-<p>此时列表 capacity == 0 and size == 0</p>
-</blockquote>
-</li>
-<li><p>如果 <code>initialCapacity &lt; 0</code> ，则抛出非法参数异常，因为容量不能为负。</p>
-</li>
-</ol>
-<h2 id="2-3-有参构造之集合参数"><a href="#2-3-有参构造之集合参数" class="headerlink" title="2.3 有参构造之集合参数"></a>2.3 有参构造之集合参数</h2><p>源码（JDK 11）：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">ArrayList</span><span class="params">(Collection&lt;? extends E&gt; c)</span> &#123;</span><br><span class="line">    Object[] a = c.toArray();</span><br><span class="line">    <span class="keyword">if</span> ((size = a.length) != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (c.getClass() == ArrayList.class) &#123;</span><br><span class="line">            elementData = a;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            elementData = Arrays.copyOf(a, size, Object[].class);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// replace with empty array.</span></span><br><span class="line">        elementData = EMPTY_ELEMENTDATA;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>ArrayList允许使用Collection类型构造实例，该方法构造一个包含指定集合元素的列表，按照集合的迭代器返回元素的顺序排列。</p>
-<h1 id="3-ArrayList数组扩容"><a href="#3-ArrayList数组扩容" class="headerlink" title="3. ArrayList数组扩容"></a>3. ArrayList数组扩容</h1><p>创建好ArrayList实例后，添加元素时，当列表容量不足时会对列表进行扩容，这要从ArrayList的 <code>add()</code> 方法讲起，来看看它是如何实现的。</p>
-<img src="/2022/05/06/ArrayList%E6%89%A9%E5%AE%B9%E6%9C%BA%E5%88%B6/add%E6%96%B9%E6%B3%95.png" class="" title="add方法"> 
-
-<p>ArrayList类中有2个 add()：</p>
-<ol>
-<li><code>void add(E e, Object[] elementData, int s)</code> 该方法是 private 的，不能被外部调用，该方法是将元素 <code>e</code> 插入到 <code>Object[]</code> 的索引 <code>s</code> 处</li>
-<li><code>boolean add(E e)</code> 该方法是将元素 e 添加到列表尾部</li>
-<li><code>boolean add(int index, E element)</code> 该方法是将元素 <code>element</code> 插入到指定索引 <code>index</code> 处</li>
-</ol>
-<p>显然，添加元素就会涉及到扩容问题（容量不足的情况下）。</p>
-<h2 id="3-1-添加元素"><a href="#3-1-添加元素" class="headerlink" title="3.1 添加元素"></a>3.1 添加元素</h2><h3 id="（1）-boolean-add-E-e"><a href="#（1）-boolean-add-E-e" class="headerlink" title="（1） boolean add(E e)"></a>（1） boolean add(E e)</h3><p>add(E e) 方法逻辑如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">add</span><span class="params">(E e)</span> &#123;</span><br><span class="line">    modCount++; <span class="comment">// 计数器</span></span><br><span class="line">    add(e, elementData, size); <span class="comment">// 调用private add()</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 私有 add()</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(E e, Object[] elementData, <span class="type">int</span> s)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (s == elementData.length)</span><br><span class="line">        elementData = grow(); <span class="comment">// 扩容</span></span><br><span class="line">    elementData[s] = e; <span class="comment">// 添加元素</span></span><br><span class="line">    size = s + <span class="number">1</span>; <span class="comment">// size + 1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>add(E e)</code> 中调用了私有的 <code>add(E e, Object[] elementData, int s)</code> 方法来添加元素，其中参数 s 传入了 size 。</p>
-<blockquote>
-<p><strong>void add(E e, Object[] elementData, int s)</strong> </p>
-<ol>
-<li><code>size</code> 与数组长度 <code>elementData.length</code> 比较。如果相等，则执行 <strong>2.</strong> ；不相等，则执行 <strong>3.</strong> </li>
-<li>数组已满，需要进行扩容（ <code>grow()</code> ）</li>
-<li>数组不满，直接将元素添加</li>
-</ol>
-</blockquote>
-<h3 id="（2）-boolean-add-int-index-E-element"><a href="#（2）-boolean-add-int-index-E-element" class="headerlink" title="（2） boolean add(int index, E element)"></a>（2） boolean add(int index, E element)</h3><p>add(int index, E element) 方法逻辑如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> index, E element)</span> &#123;</span><br><span class="line">    rangeCheckForAdd(index); <span class="comment">// 检查索引</span></span><br><span class="line">    modCount++; <span class="comment">// 计数器</span></span><br><span class="line">    <span class="keyword">final</span> <span class="type">int</span> s;</span><br><span class="line">    Object[] elementData;</span><br><span class="line">    <span class="keyword">if</span> ((s = size) == (elementData = <span class="built_in">this</span>.elementData).length) <span class="comment">// 判断数组是否满</span></span><br><span class="line">        elementData = grow(); <span class="comment">// 扩容</span></span><br><span class="line">    System.arraycopy(elementData, index, elementData, index + <span class="number">1</span>, s - index); <span class="comment">// 移动元素</span></span><br><span class="line">    elementData[index] = element; <span class="comment">// index处插入</span></span><br><span class="line">    size = s + <span class="number">1</span>; <span class="comment">// size + 1</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 检查索引</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">rangeCheckForAdd</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (index &gt; size || index &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IndexOutOfBoundsException</span>(outOfBoundsMsg(index));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>add(int index, E element)</code> 调用了 <code>rangeCheckForAdd(int index)</code> 来检查索引的合法性，非法索引会抛出异常。index 合法后会判断 size 与 length ，在数组满存的情况下调用 <code>grow()</code> 方法进行扩容。如果空间足够就会进行元素插入，与（1）方法中不同的是，该 add 是插入元素到指定 index ，因此会涉及元素移动。</p>
-<p>可以看到，（1）（2）两个 add() 方法中都调用了 <code>grow()</code> 进行扩容，下面就来看一下这个方法的具体实现。</p>
-<h2 id="3-2-扩容方法"><a href="#3-2-扩容方法" class="headerlink" title="3.2 扩容方法"></a>3.2 扩容方法</h2><p>扩容方法 <code>grow()</code> 源码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> Object[] grow() &#123;</span><br><span class="line">    <span class="keyword">return</span> grow(size + <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> Object[] grow(<span class="type">int</span> minCapacity) &#123;</span><br><span class="line">	<span class="type">return</span> <span class="variable">elementData</span> <span class="operator">=</span> Arrays.copyOf(elementData, newCapacity(minCapacity));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>  ArrayList中重载了grow()方法，无参 <code>grow()</code> 调用了有参 <code>grow(int minCapacity)</code> 。</p>
-<blockquote>
-<p><strong>Object[] grow(int minCapacity)</strong> </p>
-<p>- <code>minCapacity</code> 能够成功添加元素的最小容量</p>
-<p>- <code>return</code>  返回一个具有新容量的数组，新容量通过 <code>newCapacity()</code> 方法计算</p>
-</blockquote>
-<p>再来看一下 <code>newCapacity()</code> ：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="type">int</span> <span class="title function_">newCapacity</span><span class="params">(<span class="type">int</span> minCapacity)</span> &#123;</span><br><span class="line">    <span class="comment">// overflow-conscious code</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">oldCapacity</span> <span class="operator">=</span> elementData.length; <span class="comment">// 旧容量</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">newCapacity</span> <span class="operator">=</span> oldCapacity + (oldCapacity &gt;&gt; <span class="number">1</span>); <span class="comment">// 新容量</span></span><br><span class="line">    <span class="keyword">if</span> (newCapacity - minCapacity &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) <span class="comment">// 如果 elementData 是由无参构造创建</span></span><br><span class="line">            <span class="keyword">return</span> Math.max(DEFAULT_CAPACITY, minCapacity);</span><br><span class="line">        <span class="keyword">if</span> (minCapacity &lt; <span class="number">0</span>) <span class="comment">// overflow</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">OutOfMemoryError</span>();</span><br><span class="line">        <span class="keyword">return</span> minCapacity;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (newCapacity - MAX_ARRAY_SIZE &lt;= <span class="number">0</span>) ? newCapacity : hugeCapacity(minCapacity);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p><strong>int newCapacity(int minCapacity)</strong> </p>
-<ol>
-<li>使用旧容量 <code>oldCapacity</code> 计算新容量 <code>newCapacity</code> </li>
-<li>比较  <code>newCapacity</code> 与 <code>minCapacity</code> ，若  <code>newCapacity &gt; minCapacity </code> ，则 <code>return</code> ；否则，执行 <strong>3.</strong> </li>
-<li>判断 <code>elementData</code> 是否是由无参构造方法创建，若是，则 <code>return</code> ；否则，执行 <strong>4.</strong> </li>
-<li>判断 <code>minCapacity</code> 是否合法，若 <code>&lt; 0</code> ，抛出异常 <code>OutOfMemoryError</code> ；否则，<code>return minCapacity</code> </li>
-</ol>
-</blockquote>
-<p>从源码中可以看到，新的容量是以数组长度为基础进行计算的。<code>oldCapacity &gt;&gt; 1</code> 中涉及到了右移运算，对于一个正数来说，内存中已二进制进行存储，右移 1 位相当于缩小为原来的 1/2，<strong>因此 new 与 old 之间存在 <code>newCapacity = 1.5 * oldCapacity</code> 的关系</strong> 。</p>
-<p>其次，源码中对不同情况下有不同的 <code>return</code> ，下面通过例子对这些情况进行详细说明。根据不同构造方法，<code>elementData</code> 可以细分为以下情况：</p>
-<ol>
-<li>elementData = {}<ol>
-<li>elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA</li>
-<li>elementData == EMPTY_ELEMENTDATA : ArrayList(int initialCapacity)</li>
-<li>elementData == EMPTY_ELEMENTDATA : ArrayList(Collection&lt;? extends E&gt; c)</li>
-</ol>
-</li>
-<li>elementData != {}<ol>
-<li>一般的非空数组</li>
-<li>Collection转换的非空数组</li>
-</ol>
-</li>
-</ol>
-<blockquote>
-<p>1.2和1.3在扩容时属于同一种情况，2.1和2.2属于同一种，因此扩容时可以分为三种情况讨论，这一点从<code>newCapacity()</code> 中可以判断。</p>
-</blockquote>
-<h2 id="3-3-扩容分析"><a href="#3-3-扩容分析" class="headerlink" title="3.3 扩容分析"></a>3.3 扩容分析</h2><h3 id="1）elementData-DEFAULTCAPACITY-EMPTY-ELEMENTDATA"><a href="#1）elementData-DEFAULTCAPACITY-EMPTY-ELEMENTDATA" class="headerlink" title="1）elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA"></a>1）elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA</h3><p>ArrayList中定义了两种 <code>static final object[]</code> ，前面提到两个一样的空数组是为了区分使用不同的扩容规则，当ArrayList使用无参构造 <code>ArrayList()</code> 创建实例时，<code>elementData</code> 会被赋值为 <code>DEFAULTCAPACITY_EMPTY_ELEMENTDATA</code> 。</p>
-<p>当ArrayList首次添加元素时（下述中的 <code>=</code> 为数学逻辑）：</p>
-<ul>
-<li><p>size = 0, minCapacity = size + 1 = 1, oldCapacity = elementData.length = 0, newCapacity = 0</p>
-<p>=&gt; newCapacity - minCapacity &lt; 0,  DEFAULTCAPACITY_EMPTY_ELEMENTDATA</p>
-<p>=&gt; return Math.max(DEFAULT_CAPACITY, minCapacity), DEFAULT_CAPACITY = 10</p>
-<p>=&gt; return DEFAULT_CAPACITY</p>
-<p>=&gt; elementData.length = 10</p>
-</li>
-</ul>
-<p>无参构造下的空 ArrayList <strong>首次</strong>添加元素，elementData 扩容为10。待数组满存，再添加元素时：</p>
-<ul>
-<li><p>size = 10, minCapacity = size + 1 = 11, oldCapacity = elementData.length = 10, newCapacity = 15</p>
-<p>=&gt; newCapacity - minCapacity &gt; 0</p>
-<p>=&gt; return newCapacity</p>
-<p>=&gt; elementData.length = 15</p>
-</li>
-</ul>
-<p>elementData 按原容量的1.5倍扩容，并且容易得到，再下次扩容规则也是1.5倍。</p>
-<h3 id="2）elementData-EMPTY-ELEMENTDATA"><a href="#2）elementData-EMPTY-ELEMENTDATA" class="headerlink" title="2）elementData == EMPTY_ELEMENTDATA"></a>2）elementData == EMPTY_ELEMENTDATA</h3><p>当ArrayList使用有参构造 <code>ArrayList(int initialCapacity) </code> 和 <code>ArrayList(Collection&lt;? extends E&gt; c)</code> 创建实例时，若 <code>initialCapacity == 0</code> 或 <code>c.toArray().length == 0</code> ，<code>elementData</code> 会被赋值为 <code>EMPTY_ELEMENTDATA</code> 。</p>
-<p>当ArrayList首次添加元素时：</p>
-<ul>
-<li><p>size = 0, minCapacity = size + 1 = 1, oldCapacity = elementData.length = 0, newCapacity = 0</p>
-<p>=&gt; newCapacity - minCapacity &lt; 0, EMPTY_ELEMENTDATA, minCapacity &gt; 0</p>
-<p>=&gt; return minCapacity</p>
-<p>=&gt; elementData.length = 1</p>
-</li>
-</ul>
-<p>有参构造下的空 ArrayList <strong>首次</strong>添加元素，扩容为 minCapacity = 1。待数组满存，再添加元素时：</p>
-<ul>
-<li><p>size = 1, minCapacity = size + 1 = 2, oldCapacity = elementData.length = 1, newCapacity = 1</p>
-<p>=&gt; newCapacity - minCapacity &lt; 0, minCapacity &gt; 0</p>
-<p>=&gt; return minCapacity</p>
-<p>=&gt; elementData.length = 2</p>
-</li>
-<li><p>size = 2, minCapacity = size + 1 = 3, oldCapacity = elementData.length = 2, newCapacity = 3</p>
-<p>=&gt; newCapacity - minCapacity = 0, minCapacity &gt; 0</p>
-<p>=&gt; return minCapacity</p>
-<p>=&gt; elementData.length = 3</p>
-</li>
-<li><p>size = 3, minCapacity = size + 1 = 4, oldCapacity = elementData.length = 3, newCapacity = 4</p>
-<p>=&gt; newCapacity - minCapacity = 0, minCapacity &gt; 0</p>
-<p>=&gt; return minCapacity</p>
-<p>=&gt; elementData.length = 4</p>
-</li>
-<li><p>size = 4, minCapacity = size + 1 = 5, oldCapacity = elementData.length = 4, newCapacity = 6</p>
-<p>=&gt; newCapacity - minCapacity &gt; 0</p>
-<p>=&gt; return newCapacity </p>
-<p>=&gt; elementData.length = 6</p>
-</li>
-</ul>
-<p>当 elementData.length &lt; 4 时，按 minCapacity 扩容；当element.length &gt;= 4 时，按 newCapacity 扩容。</p>
-<h3 id="3）非空数组"><a href="#3）非空数组" class="headerlink" title="3）非空数组"></a>3）非空数组</h3><p>对于非空数组的扩容在上述也提到了，这里就不在赘述了：</p>
-<ul>
-<li>无参构造的非空数组扩容按 <code>1.5倍</code> 规则</li>
-<li>有参构造的非空数组扩容，length &lt; 4 按 <code>+1</code> 扩容，length &gt;= 4 按 <code>1.5倍</code> 扩容</li>
-</ul>
-<h2 id="3-4-验证"><a href="#3-4-验证" class="headerlink" title="3.4 验证"></a>3.4 验证</h2><p>为了验证上述分析，笔者用反射获取不同情况下添加元素时的elementData长度变化</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">printInfo</span><span class="params">(ArrayList&lt;Integer&gt; arrayList)</span> <span class="keyword">throws</span> NoSuchFieldException, IllegalAccessException &#123;</span><br><span class="line">    <span class="comment">// 反射获取 elementData</span></span><br><span class="line">    <span class="type">Field</span> <span class="variable">field</span> <span class="operator">=</span> ArrayList.class.getDeclaredField(<span class="string">&quot;elementData&quot;</span>);</span><br><span class="line">    field.setAccessible(<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 添加元素与打印</span></span><br><span class="line">    System.out.println(<span class="string">&quot;未添加元素&quot;</span>);</span><br><span class="line">    Object[] objects = (Object[]) field.get(arrayList);</span><br><span class="line">    System.out.println(<span class="string">&quot;初始数组长度：&quot;</span> + objects.length);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">12</span>; i++) &#123;</span><br><span class="line">        arrayList.add(i);</span><br><span class="line">        System.out.println(<span class="string">&quot;第&quot;</span> + i + <span class="string">&quot;添加元素&quot;</span>);</span><br><span class="line">        objects = (Object[]) field.get(arrayList);</span><br><span class="line">        <span class="keyword">if</span> (i &gt;= <span class="number">4</span>) &#123;</span><br><span class="line">            objects = (Object[]) field.get(arrayList);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">&quot;数组长度：&quot;</span> + objects.length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IllegalAccessException, NoSuchFieldException &#123;</span><br><span class="line">    <span class="comment">// 无参构造实例</span></span><br><span class="line">    ArrayList&lt;Integer&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 容量参数构造</span></span><br><span class="line">    ArrayList&lt;Integer&gt; arrayList0 = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(<span class="number">0</span>); <span class="comment">// 容量为0</span></span><br><span class="line">    ArrayList&lt;Integer&gt; arrayList2 = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(<span class="number">2</span>); <span class="comment">// 容量为2</span></span><br><span class="line">    ArrayList&lt;Integer&gt; arrayList6 = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(<span class="number">6</span>); <span class="comment">// 容量为6</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Collection构造和情况一致，此处省略，可自行设计</span></span><br><span class="line"></span><br><span class="line">    printInfo(list); <span class="comment">// 替换list可以看到不同情况的效果</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>打印结果如图，可以看到和上述分析结果一致：</p>
-<img src="/2022/05/06/ArrayList%E6%89%A9%E5%AE%B9%E6%9C%BA%E5%88%B6/%E6%89%93%E5%8D%B0.png" class="" title="文件">
-
-<h1 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h1><p>通过上述的分析可以得到不同情况下的扩容规则（<strong>扩容时机是列表满存</strong>）：</p>
-<ol>
-<li>使用无参构造 ArrayList() 创建实例，<ul>
-<li><strong>首次</strong> 添加元素，扩容为 <code>默认容量 10 </code> </li>
-<li>后续满存时按 <code>1.5倍</code> 扩容</li>
-</ul>
-</li>
-<li>使用有参构造 ArrayList(int initialCapacity) 和 ArrayList(Collection&lt;? extends E&gt; c) 创建实例，<ul>
-<li>如果添加元素时数组长度（列表容量）小于4，按 <code>+1</code> 扩容</li>
-<li>如果添加元素时数组长度（列表容量）大于等于4，按 <code>1.5倍</code> 扩容</li>
-</ul>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Collection</category>
-        <category>List</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>ArrayList</tag>
-        <tag>集合数组扩容机制</tag>
       </tags>
   </entry>
 </search>
