@@ -554,4 +554,82 @@
         <tag>三行情诗</tag>
       </tags>
   </entry>
+  <entry>
+    <title>一道笔试题：十六进制螺旋打印</title>
+    <url>/2022/06/01/%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E8%9E%BA%E6%97%8B%E6%89%93%E5%8D%B0/</url>
+    <content><![CDATA[<h1 id="1-题目"><a href="#1-题目" class="headerlink" title="1. 题目"></a>1. 题目</h1><p>前几天看到一个题目，尝试求解了一下，写这篇博客用来记录。</p>
+<img src="/2022/06/01/%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E8%9E%BA%E6%97%8B%E6%89%93%E5%8D%B0/%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E8%9E%BA%E6%97%8B%E6%89%93%E5%8D%B0.jpg" class="" title="十六进制螺旋打印">  
+
+<h1 id="2-分析"><a href="#2-分析" class="headerlink" title="2. 分析"></a>2. 分析</h1><p>从题目给的测试用例可以总结出一些规律：</p>
+<ol>
+<li>输出的矩阵的大小是由输入的整数 n 决定的，矩阵是一个 n*n 的方针</li>
+<li>输出方式是按 “左 - 下 - 右 - 上” 的顺序进行输出</li>
+<li>输出的内容是一些字符串，根据字符串的顺序可以看出是顺序的 16 进制</li>
+</ol>
+<p>这里总结一下求解时需要解决的几个问题：</p>
+<ol>
+<li>读取输入的整数</li>
+<li>字符串的存储</li>
+<li>16 进制的字符型输出</li>
+<li>输出方向/索引的变化规律</li>
+</ol>
+<h1 id="3-求解"><a href="#3-求解" class="headerlink" title="3. 求解"></a>3. 求解</h1><h2 id="3-1-读取输入"><a href="#3-1-读取输入" class="headerlink" title="3.1 读取输入"></a>3.1 读取输入</h2><p>这一步是一个小问题，就不多说了。Java 读取输入的方式如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">Scanner</span> <span class="variable">scanner</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Scanner</span>(System.in);</span><br><span class="line"><span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> scanner.nextInt();</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-2-字符串的存储"><a href="#3-2-字符串的存储" class="headerlink" title="3.2 字符串的存储"></a>3.2 字符串的存储</h2><p>由于输出的是一个矩阵，使用一个二维的字符串数组可以很好地对帖矩阵。</p>
+<p>由于它是按16进制的大小顺序输出的，那么在处理时就可以将 16 进制 按大小保存的二维数组中，最后将二维数组原样输出即可。</p>
+<p>这样就把螺旋打印的问题转换为了如何将字符串螺旋保存到二维数组中了，定义两个索引指针 <code>rindex</code> 和 <code>cindex</code> 分别表示行索引和列索引。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String[][] array = <span class="keyword">new</span> <span class="title class_">String</span>[n][n]; <span class="comment">// n为读取的输入</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3-3-16进制的字符型输出"><a href="#3-3-16进制的字符型输出" class="headerlink" title="3.3 16进制的字符型输出"></a>3.3 16进制的字符型输出</h2><p>Java中 <code>Integer</code> 类有一个方法 <code>toHexString(int i)</code> ，这个方法可以将一个 <code>int</code> 类型的整数转换为 16进制的字符串表示。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">array[rindex][cindex] = Integer.toHexString(i); <span class="comment">// 将 i 的十六进制字符串表示保存到数组中</span></span><br></pre></td></tr></table></figure>
+
+<p>由于题目中是十六进制的顺序，那么就可以使用一个计数器来不断的 +1 ，然后转换为 16 进制对应的字符。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">count</span> <span class="operator">=</span> <span class="number">1</span>; <span class="comment">// 计数器，从 1 开始</span></span><br><span class="line">array[rindex][cindex] = Integer.toHexString(count); <span class="comment">// 转换为16进制</span></span><br><span class="line">count++; <span class="comment">// 计数器 +1</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3-4-输出方向-索引的变化规律"><a href="#3-4-输出方向-索引的变化规律" class="headerlink" title="3.4 输出方向/索引的变化规律"></a>3.4 输出方向/索引的变化规律</h2><p>这个题目的难点就在于如何变换输出的索引位置。这里阐述两种方式：非递归和递归</p>
+<ol>
+<li><p><strong>非递归</strong> </p>
+<p>非递归就是按照十六进制的顺序逐个保存到二维数组中，按照 “左 - 下 - 右 - 上” 的方向。</p>
+<blockquote>
+<p>设置一个 <code>int flag</code> 来表示指向保存位置的指针前进的方向，取值分别为 <code>1, 2, 3, 4</code> 。</p>
+<p>设置两个变量 <code>rbound</code> 和 <code>cbound</code> 来表示行和列边界，当行列索引达到边界时就要更换方向，初始时两个变量的值都为 <code>n</code> 。</p>
+</blockquote>
+<p>边界条件：当指针达到边界时需要改变方向， 即修改 <code>flag</code> 的值和下一次运动的边界 <code>rbound / cbound</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(rindex == rbound)&#123;</span><br><span class="line">    <span class="comment">// 修改 rbound</span></span><br><span class="line">    <span class="comment">// 修改 flag</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(cindex == cbound)&#123;</span><br><span class="line">    <span class="comment">// 修改 cbound</span></span><br><span class="line">    <span class="comment">// 修改 flag</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>指针不断变化，直至 <code>n * n</code> 个字符串全都保存完毕，即 <code>count &gt; n * n</code> 。</p>
+</li>
+<li><p><strong>递归</strong> </p>
+<p>一般来讲，能用递归来解决的问题必须满足两个条件：</p>
+<ul>
+<li>可以通过递归调用来缩小问题规模，且新问题与原问题有着相同的形式</li>
+<li>不能无限制地调用本身，须有个出口，化简为非递归状况处理。</li>
+</ul>
+<p><strong>缩小规模：</strong> 根据螺旋输出的特点，一圈即可保存一次，通过逐圈处理可以缩小问题规模。因此缩小圈层后新问题和原问题是一样的，只是矩阵维度减小了。</p>
+<p><strong>递归出口：</strong> 缩圈到最后会有两种情况：1. 只剩一个元素；2. 剩余0个元素。这可以作为递归出口。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(n == <span class="number">0</span>)&#123;</span><br><span class="line">    <span class="keyword">return</span> array;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(n == <span class="number">1</span>)&#123;</span><br><span class="line">    array[x][y] = Integer.toHexString(count);</span><br><span class="line">    <span class="keyword">return</span> array;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/2022/06/01/%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E8%9E%BA%E6%97%8B%E6%89%93%E5%8D%B0/%E5%86%85%E5%9C%88%E4%B8%BA1.png" class="" title="内圈为1"> <img src="/2022/06/01/%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E8%9E%BA%E6%97%8B%E6%89%93%E5%8D%B0/%E5%86%85%E5%9C%88%E4%B8%BA4.png" class="" title="内圈为4">    </li>
+</ol>
+<h1 id="4-代码"><a href="#4-代码" class="headerlink" title="4. 代码"></a>4. 代码</h1><h2 id="4-1-非递归方式"><a href="#4-1-非递归方式" class="headerlink" title="4.1 非递归方式"></a>4.1 非递归方式</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> String[][] nonRecursivePrintHex(<span class="type">int</span> n) &#123;</span><br><span class="line">    String[][] array = <span class="keyword">new</span> <span class="title class_">String</span>[n][n];</span><br><span class="line">    <span class="type">int</span> <span class="variable">count</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">rindex</span> <span class="operator">=</span> <span class="number">0</span>, cindex = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">rbound</span> <span class="operator">=</span> n, cbound = n;</span><br><span class="line">    <span class="type">int</span> <span class="variable">flag</span> <span class="operator">=</span> <span class="number">1</span>; <span class="comment">// 1 行增，2 列增，3 行减， 4 列减</span></span><br><span class="line">    <span class="keyword">while</span> (count &lt;= n * n) &#123;</span><br><span class="line">        array[rindex][cindex] = Integer.toHexString(count);</span><br><span class="line">        count++;</span><br><span class="line">        <span class="keyword">switch</span> (flag) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">                rindex++;</span><br><span class="line">                <span class="keyword">if</span> (rindex == rbound) &#123;</span><br><span class="line">                    rbound = n - rbound - <span class="number">1</span>;</span><br><span class="line">                    rindex--;</span><br><span class="line">                    cindex++;</span><br><span class="line">                    flag = <span class="number">2</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">                cindex++;</span><br><span class="line">                <span class="keyword">if</span> (cindex == cbound) &#123;</span><br><span class="line">                    cbound = n - cbound;</span><br><span class="line">                    cindex--;</span><br><span class="line">                    rindex--;</span><br><span class="line">                    flag = <span class="number">3</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">                rindex--;</span><br><span class="line">                <span class="keyword">if</span> (rindex == rbound) &#123;</span><br><span class="line">                    rbound = n - rbound - <span class="number">2</span>;</span><br><span class="line">                    rindex++;</span><br><span class="line">                    cindex--;</span><br><span class="line">                    flag = <span class="number">4</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">4</span>:</span><br><span class="line">                cindex--;</span><br><span class="line">                <span class="keyword">if</span> (cindex == cbound) &#123;</span><br><span class="line">                    cbound = n - cbound - <span class="number">1</span>;</span><br><span class="line">                    cindex++;</span><br><span class="line">                    rindex++;</span><br><span class="line">                    flag = <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> array;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="4-2-递归方式"><a href="#4-2-递归方式" class="headerlink" title="4.2 递归方式"></a>4.2 递归方式</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> String[][] recursivePrintHex(String[][] array, <span class="type">int</span> n, <span class="type">int</span> count, <span class="type">int</span> x, <span class="type">int</span> y) &#123;</span><br><span class="line">    <span class="comment">// 递归出口</span></span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> array;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">1</span>) &#123;</span><br><span class="line">        array[x][y] = Integer.toHexString(count);</span><br><span class="line">        <span class="keyword">return</span> array;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 逐圈加入数组</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> x; i &lt; x + n; i++) &#123;</span><br><span class="line">        array[i][y] = Integer.toHexString(count++);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> y + <span class="number">1</span>; j &lt; y + n; j++) &#123;</span><br><span class="line">        array[x + n - <span class="number">1</span>][j] = Integer.toHexString(count++);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> x + n - <span class="number">1</span> - <span class="number">1</span>; i &gt;= x; i--) &#123;</span><br><span class="line">        array[i][y + n - <span class="number">1</span>] = Integer.toHexString(count++);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> y + n - <span class="number">1</span> - <span class="number">1</span>; j &gt; y; j--) &#123;</span><br><span class="line">        array[x][j] = Integer.toHexString(count++);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> recursivePrintHex(array, n - <span class="number">2</span>, count, x + <span class="number">1</span>, y + <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>一道笔试题</category>
+      </categories>
+      <tags>
+        <tag>笔试题</tag>
+      </tags>
+  </entry>
 </search>
