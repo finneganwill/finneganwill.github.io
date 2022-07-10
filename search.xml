@@ -35,7 +35,7 @@
 <li>使用其他工具序列化，但是要添加 getter</li>
 </ol>
 <blockquote>
-<p>SpringBoot 默认支持 Jackson，而且 FastJson 也有漏洞问题。所以使用Jackson或许是一种好方式，</p>
+<p>SpringBoot 默认支持 Jackson，而且 FastJson 也有漏洞问题。所以使用Jackson或许是一种好方式。</p>
 <p>当然也要考虑业务逻辑或团队协作等其他因素。</p>
 </blockquote>
 ]]></content>
