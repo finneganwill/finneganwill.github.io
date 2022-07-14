@@ -41,6 +41,7 @@
 ]]></content>
       <categories>
         <category>疑难杂症</category>
+        <category>Hutool</category>
       </categories>
       <tags>
         <tag>Hutool</tag>
@@ -334,6 +335,7 @@
 </ol>
 ]]></content>
       <categories>
+        <category>知根知底</category>
         <category>Java</category>
         <category>Collection</category>
       </categories>
@@ -344,7 +346,7 @@
       </tags>
   </entry>
   <entry>
-    <title>Java hashCode()与equals()</title>
+    <title>Java Object类的hashCode()与equals()</title>
     <url>/2022/04/30/hashCode%E6%96%B9%E6%B3%95%E4%B8%8Eequals%E6%96%B9%E6%B3%95/</url>
     <content><![CDATA[<p>Java 允许把任何类型的对象赋给 Object 类型的变量。当一个类被定义后，如果没有指定继承的父类，那么默认父类就是 Object 类。今天就来聊聊Object类中两个方法：<code>equals()</code> 和 <code>hashCode()</code> 。</p>
 <h1 id="1-equals"><a href="#1-equals" class="headerlink" title="1. equals()"></a>1. equals()</h1><p><code>equals()</code> 用来比较两个对象之间的是否相等。它的源码（JDK11）如下：</p>
@@ -447,7 +449,9 @@
 <h1 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h1><p>本篇无总结。</p>
 ]]></content>
       <categories>
+        <category>知根知底</category>
         <category>Java</category>
+        <category>Object</category>
       </categories>
       <tags>
         <tag>Java</tag>
@@ -546,6 +550,7 @@
 </ol>
 ]]></content>
       <categories>
+        <category>知根知底</category>
         <category>Java</category>
       </categories>
       <tags>
@@ -646,6 +651,7 @@
 </ol>
 ]]></content>
       <categories>
+        <category>操作手册</category>
         <category>Hexo</category>
       </categories>
       <tags>
@@ -675,6 +681,7 @@
 ]]></content>
       <categories>
         <category>HelloWorld</category>
+        <category>Hexo</category>
       </categories>
       <tags>
         <tag>Hexo</tag>

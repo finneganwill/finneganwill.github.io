@@ -2831,6 +2831,30 @@ ul.breadcrumb li:last-child {
     margin-bottom: 10px;
   }
 }
+.category-list-item {
+  font-weight: bold;
+  font-size: 18px;
+}
+.category-list-child .category-list-item {
+  font-weight: normal;
+  font-size: 14px;
+}
+.category-list-link:hover {
+  transform: scale(1.1);
+  box-shadow: 10px 10px 15px 2px rgba(0,0,0,0.12), 0 0 6px 0 rgba(104,104,105,0.1);
+  border-radius: 15px;
+  padding: 6px 16px;
+  margin-left: 0;
+  transition-duration: 0.15s;
+}
+a.category-list-link:before {
+  top: 10px;
+  width: 18px;
+  height: 18px;
+  margin-right: 5px;
+  font: normal normal normal 14px/1 FontAwesome;
+  line-height: 18px;
+}
 body {
   background-color: #fff;
   background-repeat: no-repeat;
