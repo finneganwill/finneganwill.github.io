@@ -1,6 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>SpringBoot无法解析Put请求参数</title>
+    <url>/2022/07/15/SpringBoot%E6%97%A0%E6%B3%95%E8%A7%A3%E6%9E%90Put%E8%AF%B7%E6%B1%82%E5%8F%82%E6%95%B0/</url>
+    <content><![CDATA[<p>使用Restful改写请求路径时，由于前端传输的不是 json 格式的数据，遇到SpringBoot接受不到Put请求参数的问题。通过配置Filter解决，以此记录。</p>
+<h1 id="1-问题"><a href="#1-问题" class="headerlink" title="1. 问题"></a>1. 问题</h1><p>Controller 里使用了 <code>@PutMapping</code> 处理更新请求，但是打印request里的请求参数发现为 <code>null</code> 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@PutMapping(&quot;/update&quot;)</span></span><br><span class="line"><span class="keyword">public</span> Object <span class="title function_">update</span><span class="params">(HttpServletRequest request)</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;请求参数：&quot;</span> + request.getParameter(<span class="string">&quot;id&quot;</span>));</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Print =&gt; 请求参数：null</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>Spring在 <code>FormContentFilter</code> 类中给出解释如下：</p>
+<blockquote>
+<p>Filter that parses form data for HTTP PUT, PATCH, and DELETE requests and exposes it as Servlet request parameters. By default the Servlet spec only requires this for HTTP POST.<br>Since: 5.1<br>Author: Rossen Stoyanchev</p>
+<p>// 为HTTP PUT、PATCH和DELETE请求解析表单数据并将其作为Servlet请求参数公开的过滤器。默认情况下，Servlet规范仅对HTTP POST需要此功能。</p>
+</blockquote>
+<p>意思是<strong>Servlet规范默认只会解析POST表单数据</strong>，对其他请求不会解析参数。</p>
+<p>通过配置这个类可以实现PUT / DELETE / PATCH等请求参数的解析。</p>
+<blockquote>
+<p>Spring 5.1 之前使用的是 <code>HttpPutFormContentFilter</code> ，Spring 5.1之后被弃用了；</p>
+<p>Spring 5.1 之后 <code>FormContentFilter</code> 把取代了上面的过滤器。</p>
+</blockquote>
+<h1 id="2-解决"><a href="#2-解决" class="headerlink" title="2. 解决"></a>2. 解决</h1><p>SpringBoot通过配置过滤器可以解决这个问题，关于Filter的配置有多种方式，这里提供两种方式。</p>
+<h2 id="2-1-WebFilter-ServletComponentScan"><a href="#2-1-WebFilter-ServletComponentScan" class="headerlink" title="2.1 @WebFilter + @ServletComponentScan"></a>2.1 @WebFilter + @ServletComponentScan</h2><p>使用这种方式你需要自定义一个Filter来继承<code>FormContentFilter</code> </p>
+<ol>
+<li><p>比如这里自定义一个 <code>PutFilter</code> 类</p>
+</li>
+<li><p>在这个类上添加 <code>@WebFilter</code> 注解</p>
+</li>
+<li><p>在启动类上添加 <code>@ServletComponentScan</code> 注解</p>
+<blockquote>
+<p>因为 Filter 是Servlet组件，在SpringBootApplication上使用@ServletComponentScan注解后，Servlet、Filter、Listener等可以直接通过@WebServlet、@WebFilter、@WebListener注解自动注册。</p>
+</blockquote>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 自定义Filter并添加@WebFilter注解，可以在属性中配置需要过滤的访问路径</span></span><br><span class="line"><span class="meta">@WebFilter</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PutFilter</span> <span class="keyword">extends</span> <span class="title class_">FormContentFilter</span> &#123;</span><br><span class="line">    <span class="comment">// 不需要重写</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 在启动类上添加@ServletComponentScan注解</span></span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@ServletComponentScan</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SpringBootTestApplication</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        SpringApplication.run(SpringBootTestApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2-自定义配置类配置过滤器"><a href="#2-2-自定义配置类配置过滤器" class="headerlink" title="2.2 自定义配置类配置过滤器"></a>2.2 自定义配置类配置过滤器</h2><p>由于这里配置FormContentFilter时自定义PutFilter也不需要任何重写操作，所以可以直接配置FormContentFilter，但是由不能在它上面直接添加@WebFilter，所以可以通过配置类 <code>@Bean</code> 注册。</p>
+<p>通过这种方式需要使用 <code>FilterRegistrationBean </code> 它可以进行路径配置、设置优先级等操作。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FilterConfig</span> &#123;</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> FilterRegistrationBean&lt;FormContentFilter&gt; <span class="title function_">getFormContentFilter</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="comment">//通过FilterRegistrationBean实例设置优先级可以生效</span></span><br><span class="line">        FilterRegistrationBean&lt;FormContentFilter&gt; bean = <span class="keyword">new</span> <span class="title class_">FilterRegistrationBean</span>&lt;&gt;();</span><br><span class="line">        bean.setFilter(<span class="keyword">new</span> <span class="title class_">FormContentFilter</span>());<span class="comment">//注册自定义过滤器</span></span><br><span class="line">        bean.addUrlPatterns(<span class="string">&quot;/*&quot;</span>);<span class="comment">//过滤所有路径</span></span><br><span class="line">        bean.setOrder(<span class="number">1</span>);<span class="comment">//优先级，最顶级</span></span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用这种方式不需要进行其他配置Spring会自动注册Bean实现Filter的过滤操作。</p>
+]]></content>
+      <categories>
+        <category>疑难杂症</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hutool将对象序列化json字符串的属性丢失问题</title>
     <url>/2022/07/09/Hutool%E5%B0%86%E5%AF%B9%E8%B1%A1%E5%BA%8F%E5%88%97%E5%8C%96json%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E5%B1%9E%E6%80%A7%E4%B8%A2%E5%A4%B1%E9%97%AE%E9%A2%98/</url>
     <content><![CDATA[<p>之前遇到一个 bug 。为了给前端返回序列化结果，使用 Hutool 工具的 <code>JSONUtil.parseObj()</code> 方法返回将对象序列化的 json 数据。但是发现序列化之后没有属性。在网上搜索了一些资料了解了一下原因，以本博客记录。</p>
